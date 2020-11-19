@@ -1,8 +1,11 @@
 package swingingAround;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public abstract class Entity {
+public abstract class Entity extends JPanel {
 
     public abstract Mathfunction[] getMathfunctions();
 
@@ -14,5 +17,4 @@ public abstract class Entity {
 
     public abstract String getName();
     public abstract void setName(String name);
-
 }

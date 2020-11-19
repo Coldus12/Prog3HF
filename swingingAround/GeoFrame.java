@@ -39,6 +39,7 @@ public class GeoFrame extends JFrame {
         renderPanel.setEnabled(true);
 
         configPanel = new JPanel();
+        //configPanel.add(new EntityPanel());
 
         cmdLine = new Console();
 
@@ -99,6 +100,12 @@ public class GeoFrame extends JFrame {
                 conf = cmdLine.getConfig();
                 //System.out.println(conf.getEntities().size());
                 //draw();
+
+                ArrayList<Entity> entities = conf.getEntities();
+                for (Entity ntity: entities) {
+                    configPanel.add(new EntityPanel(ntity));
+                    System.out.println("here");
+                }
 
                 ArrayList<Mathfunction> mfs = conf.getMathfunctions();
                 renderPanel.setScreen(cam.getScreen());
