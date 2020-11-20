@@ -15,7 +15,10 @@ import static java.lang.Thread.sleep;
 
 public class GeoFrame extends JFrame {
 
-    private ArrayList<Entity> entities;
+    /**ArrayList az entitypanelből,
+     * mindegyik elemhez egy entityt adunk
+     * remélhetőleg működik..
+    * */
     private PaintPanel renderPanel;
     //private JPanel panel;
     private JPanel configPanel;
@@ -24,6 +27,9 @@ public class GeoFrame extends JFrame {
     private Console cmdLine;
     private Config conf;
     private boolean running = true;
+    private ArrayList<EntityPanel> entityPanels;
+
+    private boolean test = false;
 
     public GeoFrame() {
         this.setSize(1080,720);
@@ -34,11 +40,17 @@ public class GeoFrame extends JFrame {
         this.setResizable(false);
         this.setLayout(new GridBagLayout());
 
+        entityPanels = new ArrayList<EntityPanel>();
+
         renderPanel = new PaintPanel(1080,720,108,72);
         renderPanel.setVisible(true);
         renderPanel.setEnabled(true);
 
         configPanel = new JPanel();
+        configPanel.setPreferredSize(new Dimension(270,720));
+        configPanel.setSize(new Dimension(270,720));
+        configPanel.setLayout(new BoxLayout(configPanel,BoxLayout.Y_AXIS));
+        //configPanel.add(new EntityPanel(new SphereEntity(new Vec3(0,0,0),5,Color.GREEN)));
         //configPanel.add(new EntityPanel());
 
         cmdLine = new Console();
@@ -56,6 +68,7 @@ public class GeoFrame extends JFrame {
         c.gridwidth = 1;
         c.gridx = 0;
         c.gridy = 0;
+        c.ipadx = 20;
         this.add(configPanel, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -96,118 +109,62 @@ public class GeoFrame extends JFrame {
         //Megjavitani a draw-t, hogy csak a teglatesten belul abrazoljon cuccokat.
         while (running) {
             try {
-                //System.out.println("here");
-                conf = cmdLine.getConfig();
-                //System.out.println(conf.getEntities().size());
-                //draw();
+                /*if (!test) {
+                    System.out.println("Waddup");
+                    configPanel.add(new EntityPanel(new SphereEntity(new Vec3(0,0,0),5,Color.GREEN)));
+                    test = true;
+                }*/
 
-                ArrayList<Entity> entities = conf.getEntities();
-                for (Entity ntity: entities) {
-                    configPanel.add(new EntityPanel(ntity));
-                    System.out.println("here");
-                }
 
-                ArrayList<Mathfunction> mfs = conf.getMathfunctions();
-                renderPanel.setScreen(cam.getScreen());
-                cam.screen.fillRectangle(0,0,cam.screen.getWidth(), cam.screen.getHeight(), new Color(30,30,30));
-
-                if (conf.isGraphingEnabled()) {
-                    //X
-                    //--------------------------------------------------------------------------------------------------
-                    for (int j = (int)  (cam.getPos().y - (conf.getNumberOfTrianglesY()/2)); j < (int) (cam.getPos().y + (conf.getNumberOfTrianglesY()/2)); j++) {
-                        for (int k = (int) (cam.getPos().z - (conf.getNumberOfTrianglesZ()/2)); k < (int) (cam.getPos().z + (conf.getNumberOfTrianglesZ()/2)); k++) {
-                            for (Mathfunction mf: mfs) {
-
-                                if (mf.getCurrentAxis() == Mathfunction.Axis.x) {
-                                    double x1 = mf.exec3DFunction(0, j, k);
-                                    double x2 = mf.exec3DFunction(0, j + 1, k);
-                                    double x3 = mf.exec3DFunction(0, j + 1, k + 1);
-                                    double x4 = mf.exec3DFunction(0, j, k + 1);
-
-                                    if (conf.getGraphingTrianglesFilled()) {
-                                        cam.render3DFilledTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x2,j+1,k),new Vec3(x3,j+1,k+1),mf.getColor()));
-                                        cam.render3DFilledTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x4,j,k+1),new Vec3(x3,j+1,k+1),mf.getColor()));
-                                    } else {
-                                        cam.render3DTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x2,j+1,k),new Vec3(x3,j+1,k+1),mf.getColor()));
-                                        cam.render3DTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x4,j,k+1),new Vec3(x3,j+1,k+1),mf.getColor()));
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-
-                    //Y
-                    //--------------------------------------------------------------------------------------------------
-                    for (int i = (int)  (cam.getPos().x - (conf.getNumberOfTrianglesX()/2)); i < (int) (cam.getPos().x + (conf.getNumberOfTrianglesX()/2)); i++) {
-                        for (int k = (int) (cam.getPos().z - (conf.getNumberOfTrianglesZ()/2)); k < (int) (cam.getPos().z + (conf.getNumberOfTrianglesZ()/2)); k++) {
-                            for (Mathfunction mf: mfs) {
-
-                                if (mf.getCurrentAxis() == Mathfunction.Axis.y) {
-                                    double y1 = mf.exec3DFunction(i,0,k);
-                                    double y2 = mf.exec3DFunction(i + 1,0,k);
-                                    double y3 = mf.exec3DFunction(i + 1,0,k + 1);
-                                    double y4 = mf.exec3DFunction(i,0,k + 1);
-
-                                    if (conf.getGraphingTrianglesFilled()) {
-                                        cam.render3DFilledTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i+1,y2,k),new Vec3(i+1,y3,k+1),mf.getColor()));
-                                        cam.render3DFilledTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i,y4,k+1),new Vec3(i+1,y3,k+1),mf.getColor()));
-                                    } else {
-                                        cam.render3DTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i+1,y2,k),new Vec3(i+1,y3,k+1),mf.getColor()));
-                                        cam.render3DTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i,y4,k+1),new Vec3(i+1,y3,k+1),mf.getColor()));
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-
-                    //Z
-                    //--------------------------------------------------------------------------------------------------
-                    for (int i = (int)  (cam.getPos().x - (conf.getNumberOfTrianglesX()/2)); i < (int) (cam.getPos().x + (conf.getNumberOfTrianglesX()/2)); i++) {
-                        for (int j = (int) (cam.getPos().y - (conf.getNumberOfTrianglesY()/2)); j < (int) (cam.getPos().y + (conf.getNumberOfTrianglesY()/2)); j++) {
-                            for (Mathfunction mf: mfs) {
-
-                                if (mf.getCurrentAxis() == Mathfunction.Axis.z) {
-                                    double z1 = mf.exec3DFunction(i,j,0);
-                                    double z2 = mf.exec3DFunction(i + 1,j,0);
-                                    double z3 = mf.exec3DFunction(i + 1,j + 1,0);
-                                    double z4 = mf.exec3DFunction(i,j + 1,0);
-
-                                    if (conf.getGraphingTrianglesFilled()) {
-                                        cam.render3DFilledTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i+1,j,z2),new Vec3(i+1,j+1,z3),mf.getColor()));
-                                        cam.render3DFilledTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i,j+1,z4),new Vec3(i+1,j+1,z3),mf.getColor()));
-                                    } else {
-                                        cam.render3DTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i+1,j,z2),new Vec3(i+1,j+1,z3),mf.getColor()));
-                                        cam.render3DTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i,j+1,z4),new Vec3(i+1,j+1,z3),mf.getColor()));
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-                renderPanel.setScreen(cam.getScreen());
-                renderPanel.repaint();
-
-                cmdLine.setConfig(conf);
+                updateConfigPanel();
+                updateEntities();
+                draw();
 
                 sleep(50);
             } catch (Exception ex) {}
         }
     }
 
+    private void updateConfigPanel() {
+        conf = cmdLine.getConfig();
+        ArrayList<Entity> entities = conf.getEntities();
+        if (entities.size() > entityPanels.size()) {
+            entityPanels.add(new EntityPanel(entities.get(entities.size()-1)));
+            entityPanels.get(entityPanels.size()-1).setAlignmentX(Component.CENTER_ALIGNMENT);
+            configPanel.add(entityPanels.get(entityPanels.size()-1));
+            configPanel.repaint();
+            configPanel.updateUI();
+        }
+    }
+
+    private void updateEntities() {
+        conf = cmdLine.getConfig();
+
+        /*for (EntityPanel panel: entityPanels) {
+            conf.updateEntity(panel.getEntity());
+            if (!panel.hasEntity())
+                entityPanels.remove(panel);
+        }*/
+
+        for (int i = 0; i < entityPanels.size(); i++) {
+            EntityPanel current = entityPanels.get(i);
+
+            conf.updateEntity(current.getEntity());
+            if (!current.hasEntity()) {
+                configPanel.remove(current);
+                entityPanels.remove(i);
+                configPanel.updateUI();
+            }
+        }
+
+        cmdLine.setConfig(conf);
+    }
+
     private void draw() {
+        conf = cmdLine.getConfig();
         ArrayList<Mathfunction> mfs = conf.getMathfunctions();
         renderPanel.setScreen(cam.getScreen());
         cam.screen.fillRectangle(0,0,cam.screen.getWidth(), cam.screen.getHeight(), new Color(30,30,30));
-
-        ArrayList<Entity> entities = conf.getEntities();
-        System.out.println(entities.size());
-        System.out.println(conf.getEntities().size());
-        for (Entity entity: entities) {
-            System.out.println(entity.getName());
-        }
 
         if (conf.isGraphingEnabled()) {
             //X
@@ -287,6 +244,8 @@ public class GeoFrame extends JFrame {
         }
         renderPanel.setScreen(cam.getScreen());
         renderPanel.repaint();
+
+        cmdLine.setConfig(conf);
     }
 
     private class ClickListener implements MouseListener {
@@ -313,26 +272,6 @@ public class GeoFrame extends JFrame {
 
         @Override
         public void mouseExited(MouseEvent mouseEvent) {
-
-        }
-    }
-
-    private class cmdListener implements KeyListener {
-        @Override
-        public void keyTyped(KeyEvent keyEvent) {
-
-        }
-
-        @Override
-        public void keyPressed(KeyEvent keyEvent) {
-            if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
-                System.out.println(cmdLine.getText());
-                cmdLine.setText("");
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent keyEvent) {
 
         }
     }

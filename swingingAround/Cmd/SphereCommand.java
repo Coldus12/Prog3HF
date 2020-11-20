@@ -14,7 +14,7 @@ public class SphereCommand implements Command {
             double z = Double.parseDouble(cmd[3]);
             double r = Double.parseDouble(cmd[4]);
 
-            conf.addEntity(new SphereEntity(new Vec3(x,y,z),(float) r, Color.RED));
+            conf.addEntity(new SphereEntity(new Vec3(x,y,z),(float) r, Color.GREEN));
         }
 
         return conf;

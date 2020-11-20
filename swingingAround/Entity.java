@@ -17,4 +17,7 @@ public abstract class Entity extends JPanel {
 
     public abstract String getName();
     public abstract void setName(String name);
+
+    public abstract boolean stillExists();
+    public abstract void delete();
 }

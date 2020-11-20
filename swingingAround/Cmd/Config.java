@@ -93,4 +93,17 @@ public class Config {
         return mfs;
     }
 
+    public void updateEntity(Entity entity) {
+        for (int i = 0; i <  entities.size(); i++) {
+            if (entities.get(i).getName().equals(entity.getName())) {
+                if (entity.stillExists())
+                    entities.set(i,entity);
+                else {
+                    entities.remove(i);
+                    return;
+                }
+            }
+        }
+    }
+
 }

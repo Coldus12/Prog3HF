@@ -13,10 +13,12 @@ public class FunctionEntity extends Entity {
     private String name;
     private Color color;
     private Mathfunction mf;
+    private boolean exists;
 
     public FunctionEntity(String[] function) {
         number++;
         name = "function" + number;
+        exists = true;
 
         color = Color.GREEN;
 
@@ -103,6 +105,7 @@ public class FunctionEntity extends Entity {
     @Override
     public void setColor(Color newColor) {
         color = newColor;
+        mf.setColor(newColor);
     }
 
     @Override
@@ -113,5 +116,15 @@ public class FunctionEntity extends Entity {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean stillExists() {
+        return exists;
+    }
+
+    @Override
+    public void delete() {
+        exists = false;
     }
 }

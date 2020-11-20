@@ -11,11 +11,13 @@ public class SphereEntity extends Entity {
     private Mathfunction mf1,mf2, mf3, mf4;
     private Vec3 center;
     private float radius;
+    private boolean exists;
 
     public SphereEntity(Vec3 center, float radius, Color c) {
         this.center = center;
         this.radius = radius;
         this.color = c;
+        exists = true;
 
         number++;
         name = "sphere" + number;
@@ -110,6 +112,10 @@ public class SphereEntity extends Entity {
     @Override
     public void setColor(Color newColor) {
         color = newColor;
+        mf1.setColor(color);
+        mf2.setColor(color);
+        mf3.setColor(color);
+        mf4.setColor(color);
     }
 
     @Override
@@ -120,5 +126,15 @@ public class SphereEntity extends Entity {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean stillExists() {
+        return exists;
+    }
+
+    @Override
+    public void delete() {
+        exists = false;
     }
 }
