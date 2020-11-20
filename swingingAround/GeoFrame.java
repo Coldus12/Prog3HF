@@ -32,7 +32,7 @@ public class GeoFrame extends JFrame {
     private boolean test = false;
 
     public GeoFrame() {
-        this.setSize(1080,720);
+        //this.setSize(1080,720);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setEnabled(true);
         this.setBounds(0,0,1080,720);
