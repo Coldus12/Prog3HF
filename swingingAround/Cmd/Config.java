@@ -2,6 +2,7 @@ package swingingAround.Cmd;
 
 import swingingAround.Entity;
 import swingingAround.Mathfunction;
+import swingingAround.Vec3;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ public class Config {
     private int numberOfTrianglesX;
     private int numberOfTrianglesZ;
     private int numberOfTrianglesY;
+
+    private Vec3 camPos;
 
     //private ArrayList<Mathfunction> functions;
     private ArrayList<Entity> entities;
@@ -54,6 +57,8 @@ public class Config {
 
     public ArrayList<Entity> getEntities() { return entities; }
 
+    public Vec3 getCamPos() {return camPos;}
+
     //Setters
     //------------------------------------------------------------------------------------------------------------------
     public void setGraphingEnabled(boolean graphingEnabled) {
@@ -73,6 +78,8 @@ public class Config {
     }
 
     public void setNumberOfTrianglesY(int numberOfTrianglesY) {this.numberOfTrianglesY = numberOfTrianglesY;}
+
+    public void setCamPos(Vec3 pos) {camPos = pos;}
 
     //Others
     //------------------------------------------------------------------------------------------------------------------

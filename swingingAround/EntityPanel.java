@@ -43,6 +43,7 @@ public class EntityPanel extends JPanel {
         formula.addKeyListener(new FormulaListener());
     }
 
+    //Ez eleg ronda
     public void updateEntityByFormula() {
         String newFormula = formula.getText();
         String[] brokenUp = newFormula.split("\\s+");

@@ -2,6 +2,9 @@ package swingingAround;
 
 import swingingAround.Cmd.Config;
 import swingingAround.Cmd.Console;
+import swingingAround.Menu.GeoOpenFileMenu;
+import swingingAround.Menu.GeoSaveAsMenu;
+import swingingAround.Menu.GeoStandardSaveMenu;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +31,10 @@ public class GeoFrame extends JFrame {
     private Config conf;
     private boolean running = true;
     private ArrayList<EntityPanel> entityPanels;
+    private JMenuBar menuBar;
+    private GeoSaveAsMenu saveAsMenu;
+    private GeoStandardSaveMenu standardSaveMenu;
+    private GeoOpenFileMenu openFileMenu;
 
     private boolean test = false;
 
@@ -103,6 +110,19 @@ public class GeoFrame extends JFrame {
 
         //conf.setGraphingTrianglesFilled(true);
 
+        //Menu
+        //--------------------------------------------------------------------------------------------------------------
+        menuBar = new JMenuBar();
+        saveAsMenu = new GeoSaveAsMenu(conf);
+        standardSaveMenu = new GeoStandardSaveMenu(conf);
+        openFileMenu = new GeoOpenFileMenu();
+        menuBar.add(standardSaveMenu);
+        menuBar.add(saveAsMenu);
+        menuBar.add(openFileMenu);
+        this.setJMenuBar(menuBar);
+
+        //Updating UI
+        //--------------------------------------------------------------------------------------------------------------
         this.setVisible(false);
         this.setVisible(true);
 
@@ -113,15 +133,13 @@ public class GeoFrame extends JFrame {
         //Megjavitani a draw-t, hogy csak a teglatesten belul abrazoljon cuccokat.
         while (running) {
             try {
-                /*if (!test) {
-                    System.out.println("Waddup");
-                    configPanel.add(new EntityPanel(new SphereEntity(new Vec3(0,0,0),5,Color.GREEN)));
-                    test = true;
-                }*/
-
-
+                conf = cmdLine.getConfig();
+                conf = openFileMenu.getConfig(conf);
                 updateConfigPanel();
                 updateEntities();
+                conf.setCamPos(cam.getPos());
+                standardSaveMenu.updateConf(conf);
+                saveAsMenu.updateConf(conf);
                 draw();
 
                 sleep(50);
@@ -130,7 +148,6 @@ public class GeoFrame extends JFrame {
     }
 
     private void updateConfigPanel() {
-        conf = cmdLine.getConfig();
         ArrayList<Entity> entities = conf.getEntities();
         if (entities.size() > entityPanels.size()) {
             entityPanels.add(new EntityPanel(entities.get(entities.size()-1)));
@@ -142,14 +159,6 @@ public class GeoFrame extends JFrame {
     }
 
     private void updateEntities() {
-        conf = cmdLine.getConfig();
-
-        /*for (EntityPanel panel: entityPanels) {
-            conf.updateEntity(panel.getEntity());
-            if (!panel.hasEntity())
-                entityPanels.remove(panel);
-        }*/
-
         for (int i = 0; i < entityPanels.size(); i++) {
             EntityPanel current = entityPanels.get(i);
 
@@ -165,7 +174,6 @@ public class GeoFrame extends JFrame {
     }
 
     private void draw() {
-        conf = cmdLine.getConfig();
         ArrayList<Mathfunction> mfs = conf.getMathfunctions();
         renderPanel.setScreen(cam.getScreen());
         cam.screen.fillRectangle(0,0,cam.screen.getWidth(), cam.screen.getHeight(), new Color(30,30,30));

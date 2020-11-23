@@ -68,6 +68,14 @@ public class Console extends JTextField {
         }
     }
 
+    public void tryToExecFormula(String formula) {
+        String[] cmd = formula.split("\\s+");
+        if (commands.containsKey(cmd[0])) {
+            Command cm = commands.get(cmd[0]);
+            currentConf = cm.execute(cmd, currentConf);
+        }
+    }
+
     private class cmdListener implements KeyListener {
         @Override
         public void keyTyped(KeyEvent keyEvent) {
