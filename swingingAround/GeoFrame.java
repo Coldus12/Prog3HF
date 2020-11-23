@@ -35,10 +35,11 @@ public class GeoFrame extends JFrame {
         //this.setSize(1080,720);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setEnabled(true);
-        this.setBounds(0,0,1080,720);
+        this.setBounds(0,0,1350,775);
         this.setVisible(true);
         this.setResizable(false);
         this.setLayout(new GridBagLayout());
+        this.setTitle("GeoCopy");
 
         entityPanels = new ArrayList<EntityPanel>();
 
@@ -48,10 +49,10 @@ public class GeoFrame extends JFrame {
 
         configPanel = new JPanel();
         configPanel.setPreferredSize(new Dimension(270,720));
+        configPanel.setSize(270,720);
+        configPanel.setMinimumSize(new Dimension(270,720));
         configPanel.setSize(new Dimension(270,720));
         configPanel.setLayout(new BoxLayout(configPanel,BoxLayout.Y_AXIS));
-        //configPanel.add(new EntityPanel(new SphereEntity(new Vec3(0,0,0),5,Color.GREEN)));
-        //configPanel.add(new EntityPanel());
 
         cmdLine = new Console();
 
@@ -101,6 +102,9 @@ public class GeoFrame extends JFrame {
         cmdLine.setConfig(conf);
 
         //conf.setGraphingTrianglesFilled(true);
+
+        this.setVisible(false);
+        this.setVisible(true);
 
         //Main loop?
         //--------------------------------------------------------------------------------------------------------------
