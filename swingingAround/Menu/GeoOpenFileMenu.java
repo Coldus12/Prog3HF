@@ -101,6 +101,7 @@ public class GeoOpenFileMenu extends JMenuItem {
                         openedAFile = true;
 
                         System.out.println("done reading a file");
+                        bf.close();
                         fr.close();
                     }
                 } catch (IOException ex) {ex.printStackTrace();}

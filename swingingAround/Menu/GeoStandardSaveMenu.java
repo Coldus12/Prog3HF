@@ -43,13 +43,14 @@ public class GeoStandardSaveMenu extends JMenuItem {
 
             try {
                 FileWriter fw = new FileWriter(saveFile);
-                //BufferedWriter bf = new BufferedWriter(fw);
+                BufferedWriter bf = new BufferedWriter(fw);
                 Vec3 cam = currentConf.getCamPos();
-                fw.write(cam.x + " " + cam.y + " " + cam.z);
+                bf.write(cam.x + " " + cam.y + " " + cam.z);
 
                 for (Entity n: entities)
-                    fw.write("\n"+n.getFormula());
+                    bf.write("\n"+n.getFormula());
 
+                bf.close();
                 fw.close();
             } catch (IOException ex) {ex.printStackTrace();}
         }

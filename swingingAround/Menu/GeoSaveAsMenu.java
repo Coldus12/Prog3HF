@@ -63,13 +63,14 @@ public class GeoSaveAsMenu extends JMenuItem {
                         chosenFile = new File(chosenFile.getPath() + ".ggk");
 
                     FileWriter fw = new FileWriter(chosenFile);
-                    //BufferedWriter bf = new BufferedWriter(fw);
+                    BufferedWriter bf = new BufferedWriter(fw);
                     Vec3 cam = currentConf.getCamPos();
-                    fw.write(cam.x + " " + cam.y + " " + cam.z);
+                    bf.write(cam.x + " " + cam.y + " " + cam.z);
 
                     for (Entity n: entities)
-                        fw.write("\n"+n.getFormula());
+                        bf.write("\n"+n.getFormula());
 
+                    bf.close();
                     fw.close();
                 } catch (IOException ex) {ex.printStackTrace();}
             }

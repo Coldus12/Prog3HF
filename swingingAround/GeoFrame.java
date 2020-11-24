@@ -43,7 +43,7 @@ public class GeoFrame extends JFrame {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setEnabled(true);
         this.setBounds(0,0,1350,775);
-        this.setVisible(true);
+        //this.setVisible(true);
         this.setResizable(false);
         this.setLayout(new GridBagLayout());
         this.setTitle("GeoCopy");
@@ -123,7 +123,7 @@ public class GeoFrame extends JFrame {
 
         //Updating UI
         //--------------------------------------------------------------------------------------------------------------
-        this.setVisible(false);
+        //this.setVisible(false);
         this.setVisible(true);
 
         //Main loop?
