@@ -1,6 +1,7 @@
 package swingingAround.Cmd;
 
 import swingingAround.Entity;
+import swingingAround.LineEntity;
 import swingingAround.Mathfunction;
 import swingingAround.Vec3;
 
@@ -20,9 +21,11 @@ public class Config {
 
     //private ArrayList<Mathfunction> functions;
     private ArrayList<Entity> entities;
+    private ArrayList<LineEntity> lines;
 
     public Config() {
         entities = new ArrayList<Entity>();
+        lines = new ArrayList<LineEntity>();
     }
 
     public Config(Config conf) {
@@ -33,6 +36,7 @@ public class Config {
         this.numberOfTrianglesY = conf.numberOfTrianglesY;
 
         this.entities = conf.getEntities();
+        this.lines = conf.getLines();
     }
 
     //Getters
@@ -56,6 +60,8 @@ public class Config {
     public int getNumberOfTrianglesY() { return  numberOfTrianglesY; }
 
     public ArrayList<Entity> getEntities() { return entities; }
+
+    public ArrayList<LineEntity> getLines() { return lines; }
 
     public Vec3 getCamPos() {return camPos;}
 
@@ -101,6 +107,12 @@ public class Config {
     }
 
     public void updateEntity(Entity entity) {
+        for (LineEntity line: lines) {
+            System.out.println(line.stillExists());
+            if (!line.stillExists())
+                lines.remove(line);
+        }
+
         for (int i = 0; i <  entities.size(); i++) {
             if (entities.get(i).getName().equals(entity.getName())) {
                 if (entity.stillExists())
@@ -111,6 +123,11 @@ public class Config {
                 }
             }
         }
+    }
+
+    public void addLine(LineEntity line) {
+        lines.add(line);
+        entities.add(line);
     }
 
 }

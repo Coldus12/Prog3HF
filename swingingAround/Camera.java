@@ -195,4 +195,40 @@ public class Camera {
             } catch (Exception ex) {ex.printStackTrace();}
         }
     }
+
+    public void render3DLine(Vec3 p1, Vec3 p2, Color c) {
+        dMatrix inverse = base;
+        inverse = inverse.multiplyByNumber(distanceToScreen);
+        inverse = inverse.getInverse();
+
+        Vec3 v1b = p1.multiplyVec3ByMatrix(inverse);
+        Vec3 v2b = p2.multiplyVec3ByMatrix(inverse);
+
+        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverse);
+        //Vec3 camPos = getPos();
+
+        v1b = new Vec3(v1b.x - camPos.x, v1b.y - camPos.y, v1b.z - camPos.z);
+        v2b = new Vec3(v2b.x - camPos.x, v2b.y - camPos.y, v2b.z - camPos.z);
+
+        if ((v1b.z > 0) && (v2b.z  > 0)) {
+            v1b.multiplyByNumber((distanceToScreen)/(v1b.z));
+            v2b.multiplyByNumber((distanceToScreen)/(v2b.z));
+
+            v1b.x += screen.getWidth()/2.0;
+            v2b.x += screen.getWidth()/2.0;
+
+            v1b.y = screen.getHeight()/2.0 - v1b.y;
+            v2b.y = screen.getHeight()/2.0 - v2b.y;
+
+            try {
+                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, new Color(90,90,9));
+                //screen.drawTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
+                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
+                //screen.setColorAt((int) v1b.x, (int) v1b.y,Color.CYAN);
+                //screen.setColorAt((int) v2b.x, (int) v2b.y,Color.CYAN);
+                //screen.setColorAt((int) v3b.x, (int) v3b.y,Color.CYAN);
+                screen.drawLine((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, c);
+            } catch (Exception ex) {ex.printStackTrace();}
+        }
+    }
 }

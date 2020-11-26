@@ -50,6 +50,9 @@ public class Console extends JTextField {
 
         commands.put("sphere", new SphereCommand());
         commands.put("Sphere", new SphereCommand());
+
+        commands.put("Line",new LineCommand());
+        commands.put("line",new LineCommand());
     }
 
     public void setConfig(Config conf) {currentConf = conf;}

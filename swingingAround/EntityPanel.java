@@ -67,6 +67,25 @@ public class EntityPanel extends JPanel {
                 entity = new SphereEntity(new Vec3(x,y,z),(float) r, color);
                 entity.setName(former);
             }
+
+            //EZ szar
+            //nem adja hozza a line-okhoz
+            //es egyebkent sem bovitheto
+            //JOBB MEGOLDAS KELL
+        } else if (brokenUp[0].equals("line") || brokenUp[0].equals("Line")) {
+            if (brokenUp.length == 7) {
+                String former = entity.getName();
+
+                double x1 = Double.parseDouble(brokenUp[1]);
+                double y1 = Double.parseDouble(brokenUp[2]);
+                double z1 = Double.parseDouble(brokenUp[3]);
+                double x2 = Double.parseDouble(brokenUp[4]);
+                double y2 = Double.parseDouble(brokenUp[5]);
+                double z2 = Double.parseDouble(brokenUp[6]);
+
+                entity = new LineEntity(new Vec3(x1,y1,z1), new Vec3(x2,y2,z2), Color.GREEN);
+                entity.setName(former);
+            }
         }
     }
 

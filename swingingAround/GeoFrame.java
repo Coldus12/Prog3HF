@@ -177,8 +177,24 @@ public class GeoFrame extends JFrame {
         ArrayList<Mathfunction> mfs = conf.getMathfunctions();
         renderPanel.setScreen(cam.getScreen());
         cam.screen.fillRectangle(0,0,cam.screen.getWidth(), cam.screen.getHeight(), new Color(30,30,30));
+        ArrayList<LineEntity> lines = conf.getLines();
 
         if (conf.isGraphingEnabled()) {
+            //Kezdo lambda
+            for (LineEntity line: lines) {
+                double lambda = (cam.getPos().x) / line.getDirection().x - (conf.getNumberOfTrianglesX());
+                //System.out.println("EY");
+
+                for (int i = (int) lambda; i < (int) (lambda + (conf.getNumberOfTrianglesX())); i++) {
+                    Vec3 p1 = line.calcPartOfLine(i);
+                    Vec3 p2 = line.calcPartOfLine(i+1);
+
+                    cam.render3DLine(p1, p2, line.getColor());
+                    //cam.render3DLine(new Vec3(0,0,0), new Vec3(10,10,10),Color.BLACK);
+                    //System.out.println("Eh?");
+                }
+            }
+
             //X
             //--------------------------------------------------------------------------------------------------
             for (int j = (int)  (cam.getPos().y - (conf.getNumberOfTrianglesY()/2)); j < (int) (cam.getPos().y + (conf.getNumberOfTrianglesY()/2)); j++) {
