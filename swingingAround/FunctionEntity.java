@@ -4,6 +4,7 @@ import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import swingingAround.Math.MathHelper;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class FunctionEntity extends Entity {
 
@@ -25,17 +26,21 @@ public class FunctionEntity extends Entity {
         mf = new Mathfunction() {
             @Override
             public float exec3DFunction(float x, float y, float z) {
-                String[] tmp = new String[function.length - 2];
-                System.arraycopy(function,2,tmp,0,function.length-2);
+                String[] strTmp = new String[function.length - 1];
+                System.arraycopy(function,1,strTmp,0,function.length-1);
 
+                String tmp = MathHelper.putTogether(strTmp);
+                //System.out.println(tmp+" THIS THE TEMP");
 
-                tmp = MathHelper.changeStringToVal(tmp,"x",x);
-                tmp = MathHelper.changeStringToVal(tmp,"y",y);
-                tmp = MathHelper.changeStringToVal(tmp,"z",z);
+                tmp = MathHelper.changeSubstringToVal(tmp,"x",x);
+                tmp = MathHelper.changeSubstringToVal(tmp,"y",y);
+                tmp = MathHelper.changeSubstringToVal(tmp,"z",z);
 
-                tmp = MathHelper.changeStringToVal(tmp,"X",x);
-                tmp = MathHelper.changeStringToVal(tmp,"Y",y);
-                tmp = MathHelper.changeStringToVal(tmp,"Z",z);
+                tmp = MathHelper.changeSubstringToVal(tmp,"X",x);
+                tmp = MathHelper.changeSubstringToVal(tmp,"Y",y);
+                tmp = MathHelper.changeSubstringToVal(tmp,"Z",z);
+
+                //System.out.println(tmp+" THIS THE CHANGED");
 
                 //System.out.println("--------------------------------------------------------------------------------------");
                 //MathHelper.printEx(tmp);
@@ -49,6 +54,7 @@ public class FunctionEntity extends Entity {
             }
         };
 
+        //System.exit(0);
         mf.setColor(color);
 
         switch (function[0]) {
@@ -71,7 +77,9 @@ public class FunctionEntity extends Entity {
 
         formula = "";
         StringBuilder stringBuilder = new StringBuilder(formula);
-        for (int i = 0; i < function.length-1; i++) {
+        stringBuilder.append(function[0]);
+        stringBuilder.append("=");
+        for (int i = 1; i < function.length-1; i++) {
             stringBuilder.append(function[i]);
             stringBuilder.append(" ");
         }

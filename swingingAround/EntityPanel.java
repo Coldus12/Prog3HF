@@ -46,10 +46,12 @@ public class EntityPanel extends JPanel {
     //Ez eleg ronda
     public void updateEntityByFormula() {
         String newFormula = formula.getText();
+        System.out.println(newFormula);
+        newFormula = newFormula.replace("="," ");
         String[] brokenUp = newFormula.split("\\s+");
 
         if (brokenUp[0].equals("y") || brokenUp[0].equals("x") || brokenUp[0].equals("z")) {
-            if (brokenUp.length >= 3) {
+            if (brokenUp.length >= 2) {
                 String former = entity.getName();
                 entity = new FunctionEntity(brokenUp);
                 entity.setName(former);

@@ -64,6 +64,8 @@ public class Console extends JTextField {
 
         System.out.println(currentCmd);
 
+        currentCmd = currentCmd.replace("="," ");
+
         String[] cmd = currentCmd.split("\\s+");
         if (commands.containsKey(cmd[0])) {
             Command cm = commands.get(cmd[0]);
@@ -72,6 +74,7 @@ public class Console extends JTextField {
     }
 
     public void tryToExecFormula(String formula) {
+        formula = formula.replace("="," ");
         String[] cmd = formula.split("\\s+");
         if (commands.containsKey(cmd[0])) {
             Command cm = commands.get(cmd[0]);

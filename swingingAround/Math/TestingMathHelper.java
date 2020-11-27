@@ -19,10 +19,10 @@ public class TestingMathHelper {
         //Config conf = new Config();
         //Graph graph = new Graph();
 
-        String[] e = expression.split(" ");
-        e = MathHelper.changeStringToVal(e,"x",1);
-        e = MathHelper.changeStringToVal(e, "e", 2.71);
-        e = MathHelper.changeStringToVal(e, "y", 1);
+        //String[] e = expression.split(" ");
+        //e = MathHelper.changeStringToVal(e,"x",1);
+        //e = MathHelper.changeStringToVal(e, "e", 2.71);
+        //e = MathHelper.changeStringToVal(e, "y", 1);
 
         //conf = graph.execute(e,conf);
         //e = MathHelper.removeFromArray(e,2);
@@ -33,7 +33,7 @@ public class TestingMathHelper {
             //String[] a = MathHelper.executeExpression(e);
             //String[] a = MathHelper.executeExpressionReal(e,3, 9);
             System.out.println("The value of this expression equals to: ");
-            System.out.println(MathHelper.executeExpression(e));
+            //System.out.println(MathHelper.executeExpression(e));
 
             //System.out.println(conf.execMathFunction(1,1,1));
         } catch (Exception ex) {ex.printStackTrace();}

@@ -107,11 +107,7 @@ public class Config {
     }
 
     public void updateEntity(Entity entity) {
-        for (LineEntity line: lines) {
-            System.out.println(line.stillExists());
-            if (!line.stillExists())
-                lines.remove(line);
-        }
+        lines.removeIf(line -> !line.stillExists());
 
         for (int i = 0; i <  entities.size(); i++) {
             if (entities.get(i).getName().equals(entity.getName())) {

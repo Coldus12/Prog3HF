@@ -77,7 +77,7 @@ public class SphereEntity extends Entity {
 
         //System.out.println(mf1.getColor().toString());
 
-        formula = "Sphere(" + center.x + "," + center.y + "," + center.z + "," + radius + ")";
+        formula = "Sphere " + center.x + " " + center.y + " " + center.z + " " + radius;
     }
 
     /*public SphereEntity(Vec3 center, float radius) {
