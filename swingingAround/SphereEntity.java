@@ -5,22 +5,19 @@ import java.awt.*;
 public class SphereEntity extends Entity {
     private static int number;
 
-    private String formula;
-    private String name;
     private Color color;
     private Mathfunction mf1,mf2, mf3, mf4;
     private Vec3 center;
     private float radius;
-    private boolean exists;
 
     public SphereEntity(Vec3 center, float radius, Color c) {
         this.center = center;
         this.radius = radius;
         this.color = c;
-        exists = true;
 
         number++;
-        name = "sphere" + number;
+        setId("sphere" + number);
+        setName("sphere" + number);
 
         mf1 = new Mathfunction() {
             @Override
@@ -75,14 +72,8 @@ public class SphereEntity extends Entity {
         mf3.setColor(color);
         mf4.setColor(color);
 
-        //System.out.println(mf1.getColor().toString());
-
-        formula = "Sphere " + center.x + " " + center.y + " " + center.z + " " + radius;
+        setFormula("Sphere " + center.x + " " + center.y + " " + center.z + " " + radius);
     }
-
-    /*public SphereEntity(Vec3 center, float radius) {
-        this = new SphereEntity(center,radius,Color.GREEN);
-    }*/
 
     @Override
     public Mathfunction[] getMathfunctions() {
@@ -95,46 +86,11 @@ public class SphereEntity extends Entity {
     }
 
     @Override
-    public String getFormula() {
-        return formula;
-    }
-
-    @Override
-    public void setFormula(String string) {
-        formula = string;
-    }
-
-    @Override
-    public Color getColor() {
-        return color;
-    }
-
-    @Override
     public void setColor(Color newColor) {
         color = newColor;
         mf1.setColor(color);
         mf2.setColor(color);
         mf3.setColor(color);
         mf4.setColor(color);
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean stillExists() {
-        return exists;
-    }
-
-    @Override
-    public void delete() {
-        exists = false;
     }
 }

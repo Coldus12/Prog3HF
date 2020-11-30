@@ -1,8 +1,6 @@
 package swingingAround.Cmd;
 
 import swingingAround.Entity;
-import swingingAround.GeoFrame;
-import swingingAround.Graph;
 
 import javax.swing.*;
 import java.awt.*;
@@ -72,35 +70,75 @@ public class Console extends JTextField {
 
         System.out.println(currentCmd);
 
+        String formulaCopy = currentCmd;
+
+        if (currentCmd.contains(":"))
+            currentCmd = currentCmd.substring(0,currentCmd.indexOf(":"));
+
         currentCmd = currentCmd.replace("="," ");
 
         String[] cmd = currentCmd.split("\\s+");
         if (commands.containsKey(cmd[0])) {
             Command cm = commands.get(cmd[0]);
             currentConf = cm.execute(cmd, currentConf);
+            checkNameChange(formulaCopy);
         }
     }
 
     public void tryToExecFormula(String formula) {
+        String formulaCopy = formula;
+
+        if (formula.contains(":"))
+            formula = formula.substring(0,formula.indexOf(":"));
+
         formula = formula.replace("="," ");
         String[] cmd = formula.split("\\s+");
+
         if (commands.containsKey(cmd[0])) {
             Command cm = commands.get(cmd[0]);
             currentConf = cm.execute(cmd, currentConf);
+            checkNameChange(formulaCopy);
         }
     }
 
-    public static Config tryToExecChangedFormula(Config conf, String formula, String entityName) {
-        conf.removeEntity(entityName);
+    public static Config tryToExecChangedFormula(Config conf, String formula, String entityId) {
+        String formulaCopy = formula;
+
+        conf.removeEntity(entityId);
+
+        if (formula.contains(":"))
+            formula = formula.substring(0,formula.indexOf(":"));
 
         formula = formula.replace("="," ");
         String[] cmd = formula.split("\\s+");
+
         if (commands.containsKey(cmd[0])) {
             Command cm = commands.get(cmd[0]);
             conf = cm.execute(cmd, conf);
+            conf = staticCheckNameChange(conf, formulaCopy);
         }
 
         return conf;
+    }
+
+    public static Config staticCheckNameChange(Config conf, String formula) {
+        String[] cmd = formula.split(":");
+        if (cmd.length >= 2) {
+            String name = cmd[1];
+            name = name.replace(" ","");
+            ArrayList<Entity> entities = conf.getEntities();
+
+            Entity nameChange = entities.get(entities.size()-1);
+            nameChange.setName(name);
+
+            conf.getEntities().set(entities.size()-1,nameChange);
+        }
+
+        return conf;
+    }
+
+    public void checkNameChange(String formula) {
+        currentConf = staticCheckNameChange(currentConf, formula);
     }
 
     private class cmdListener implements KeyListener {

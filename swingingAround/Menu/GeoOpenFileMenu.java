@@ -92,12 +92,14 @@ public class GeoOpenFileMenu extends JMenuItem {
                         Vec3 camPos = new Vec3(posX,posY,posZ);
 
                         currentConf.setCamPos(camPos);
+                        //System.out.println("CurrentConf" + currentConf.getCamPos());
 
                         while ((line = bf.readLine()) != null) {
                             console.tryToExecFormula(line);
                         }
 
                         currentConf = console.getConfig();
+                        currentConf.setFreshlyLoadedFromFile(true);
                         openedAFile = true;
 
                         System.out.println("done reading a file");

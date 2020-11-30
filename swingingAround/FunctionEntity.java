@@ -10,16 +10,13 @@ public class FunctionEntity extends Entity {
 
     private static int number;
 
-    private String formula;
-    private String name;
-    private Color color;
     private Mathfunction mf;
-    private boolean exists;
+    private Color color;
 
     public FunctionEntity(String[] function) {
         number++;
-        name = "function" + number;
-        exists = true;
+        setName("function" + number);
+        setId("function"+number);
 
         color = Color.GREEN;
 
@@ -79,7 +76,7 @@ public class FunctionEntity extends Entity {
                 break;
         }
 
-        formula = "";
+        String formula = "";
         StringBuilder stringBuilder = new StringBuilder(formula);
         stringBuilder.append(function[0]);
         stringBuilder.append("=");
@@ -90,6 +87,7 @@ public class FunctionEntity extends Entity {
         stringBuilder.append(function[function.length-1]);
 
         formula = stringBuilder.toString();
+        setFormula(formula);
     }
 
     @Override
@@ -97,16 +95,6 @@ public class FunctionEntity extends Entity {
         Mathfunction[] mfs = new Mathfunction[1];
         mfs[0] = mf;
         return mfs;
-    }
-
-    @Override
-    public String getFormula() {
-        return formula;
-    }
-
-    @Override
-    public void setFormula(String string) {
-        formula = string;
     }
 
     @Override
@@ -120,23 +108,4 @@ public class FunctionEntity extends Entity {
         mf.setColor(newColor);
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean stillExists() {
-        return exists;
-    }
-
-    @Override
-    public void delete() {
-        exists = false;
-    }
 }

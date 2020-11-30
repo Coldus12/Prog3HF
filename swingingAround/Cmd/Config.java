@@ -17,6 +17,7 @@ public class Config {
     private Vec3 camPos;
 
     private double stepSize = 1;
+    private boolean freshlyLoadedFromFile = false;
 
     //private ArrayList<Mathfunction> functions;
     private ArrayList<Entity> entities;
@@ -74,6 +75,8 @@ public class Config {
 
     public double getStepSize() { return stepSize; }
 
+    public boolean isConfigFreshlyLoaded() { return freshlyLoadedFromFile; }
+
     //Setters
     //------------------------------------------------------------------------------------------------------------------
     public void setGraphingEnabled(boolean graphingEnabled) {
@@ -98,16 +101,18 @@ public class Config {
 
     public void setStepSize(double newStepSize) { stepSize = newStepSize; }
 
+    public void setFreshlyLoadedFromFile(boolean freshlyLoaded) { freshlyLoadedFromFile = freshlyLoaded; }
+
     //Others
     //------------------------------------------------------------------------------------------------------------------
     public void addEntity(Entity entity) {
         entities.add(entity);
     }
 
-    public void removeEntity(String entityName) {
-        lines.removeIf(line -> (line.getName().equals(entityName)));
-        points.removeIf(point -> (point.getName().equals(entityName)));
-        entities.removeIf(n -> (n.getName().equals(entityName)));
+    public void removeEntity(String entityId) {
+        lines.removeIf(line -> (line.getName().equals(entityId)));
+        points.removeIf(point -> (point.getName().equals(entityId)));
+        entities.removeIf(n -> (n.getName().equals(entityId)));
     }
 
     public ArrayList<Mathfunction> getMathfunctions() {
@@ -124,7 +129,7 @@ public class Config {
         points.removeIf(point -> !point.stillExists());
 
         for (int i = 0; i <  entities.size(); i++) {
-            if (entities.get(i).getName().equals(entity.getName())) {
+            if (entities.get(i).getId().equals(entity.getId())) {
                 /*if (entity.stillExists())
                     entities.set(i,entity);
                 else {

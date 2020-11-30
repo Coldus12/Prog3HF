@@ -135,10 +135,9 @@ public class GeoFrame extends JFrame {
         while (running) {
             try {
                 conf = cmdLine.getConfig();
-                conf = openFileMenu.getConfig(conf);
+                loadingOpenedConfig();
                 updateConfigPanel();
                 updateEntities();
-                conf.setCamPos(cam.getPos());
                 standardSaveMenu.updateConf(conf);
                 saveAsMenu.updateConf(conf);
                 draw();
@@ -150,18 +149,32 @@ public class GeoFrame extends JFrame {
 
     private void updateConfigPanel() {
         ArrayList<Entity> entities = conf.getEntities();
-        if (entities.size() > entityPanels.size()) {
-            entityPanels.add(new EntityPanel(entities.get(entities.size()-1),conf));
-            entityPanels.get(entityPanels.size()-1).setAlignmentX(Component.CENTER_ALIGNMENT);
-            configPanel.add(entityPanels.get(entityPanels.size()-1));
-            configPanel.repaint();
-            configPanel.updateUI();
+
+        if (conf.isConfigFreshlyLoaded()) {
+            entityPanels = new ArrayList<EntityPanel>();
+            configPanel.removeAll();
+
+            for (int i = 0; i < entities.size(); i++) {
+                entityPanels.add(new EntityPanel(entities.get(i),conf));
+                entityPanels.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
+                configPanel.add(entityPanels.get(i));
+            }
+        } else {
+            if (entities.size() > entityPanels.size()) {
+                entityPanels.add(new EntityPanel(entities.get(entities.size()-1),conf));
+                entityPanels.get(entityPanels.size()-1).setAlignmentX(Component.CENTER_ALIGNMENT);
+                configPanel.add(entityPanels.get(entityPanels.size()-1));
+            }
         }
+
+        configPanel.repaint();
+        configPanel.updateUI();
     }
 
     private void updateEntities() {
         for (int i = 0; i < entityPanels.size(); i++) {
             EntityPanel current = entityPanels.get(i);
+            //System.out.println("Name: " + current.getEntity().getName() + " ID: " + current.getEntity().getId());
 
             conf.updateEntity(current.getEntity());
             if (!current.hasEntity()) {
@@ -177,6 +190,15 @@ public class GeoFrame extends JFrame {
         }
 
         cmdLine.setConfig(conf);
+    }
+
+    private void loadingOpenedConfig() {
+        conf.setCamPos(cam.getPos());
+        conf = openFileMenu.getConfig(conf);
+
+        if (!conf.getCamPos().equals(cam.getPos())) {
+            cam.setPos(conf.getCamPos());
+        }
     }
 
     private void draw() {
@@ -384,9 +406,14 @@ public class GeoFrame extends JFrame {
                     //cam.setPos(cam.getPos());
                     cam.setPos(new Vec3(cam.getPos().x+=1,cam.getPos().y,cam.getPos().z));
                     break;
+                case KeyEvent.VK_U:
+                    cam.setPos(new Vec3(cam.getPos().x,cam.getPos().y+=1,cam.getPos().z));
+
+                    break;
 
                 default:
                     //renderPanel.drawTriangle(0,0,10,10,30,40,Color.GREEN);
+                    System.out.println(cam.getPos());
                     renderPanel.repaint();
                     //defualt();
                     break;

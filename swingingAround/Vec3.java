@@ -49,6 +49,14 @@ public class Vec3 {
         System.out.println(x + " " + y + " " + z);
     }
 
+    public boolean equals(Vec3 vec) {
+        return ((this.x == vec.x) && (this.y == vec.y) && (this.z == vec.z));
+    }
+
+    public String toString() {
+        return x + " " + y + " " + z;
+    }
+
     public static Vec3 vecPlusVec(Vec3 v1, Vec3 v2) {
         return new Vec3(v1.x + v2.x,v1.y + v2.y, v1.z + v2.z);
     }

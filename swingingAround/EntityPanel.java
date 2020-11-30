@@ -35,6 +35,8 @@ public class EntityPanel extends JPanel {
 
         this.entity = entity;
         formula = new JTextField();
+        formula.setSize(100,20);
+        formula.setPreferredSize(new Dimension(100,20));
         formula.setText(entity.getFormula());
         Font font = formula.getFont();
         font = font.deriveFont((float) 14);
@@ -55,9 +57,10 @@ public class EntityPanel extends JPanel {
     public void updateEntityByFormula() {
         confChanged = true;
 
-        currentConf = Console.tryToExecChangedFormula(currentConf,formula.getText(), entity.getName());
+        currentConf = Console.tryToExecChangedFormula(currentConf,formula.getText(), entity.getId());
         ArrayList<Entity> entities = currentConf.getEntities();
         entity = entities.get(entities.size()-1);
+        entity.setColor(color);
     }
 
     public void setConfig(Config conf) {

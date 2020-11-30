@@ -7,17 +7,51 @@ import java.awt.event.ActionListener;
 
 public abstract class Entity {
 
+    private String formula;
+    private Color color;
+    private String name;
+    private String id;
+    private boolean exists = true;
+
     public abstract Mathfunction[] getMathfunctions();
 
-    public abstract String getFormula();
-    public abstract void setFormula(String string);
+    public String getFormula() {
+        return formula;
+    }
 
-    public abstract Color getColor();
-    public abstract void setColor(Color newColor);
+    public void setFormula(String string) {
+        formula = string;
+    }
 
-    public abstract String getName();
-    public abstract void setName(String name);
+    public Color getColor() {
+        return color;
+    }
 
-    public abstract boolean stillExists();
-    public abstract void delete();
+    public void setColor(Color newColor) {
+        color = newColor;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setId(String newId) {
+        id = newId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean stillExists() {
+        return exists;
+    }
+
+    public void delete() {
+        exists = false;
+    }
 }

@@ -48,7 +48,12 @@ public class GeoStandardSaveMenu extends JMenuItem {
                 bf.write(cam.x + " " + cam.y + " " + cam.z);
 
                 for (Entity n: entities)
-                    bf.write("\n"+n.getFormula());
+                    bf.write("\n"+n.getFormula() + " : " + n.getName());
+
+                bf.write("\nset width " + currentConf.getNumberOfTrianglesX());
+                bf.write("\nset height " + currentConf.getNumberOfTrianglesY());
+                bf.write("\nset length " + currentConf.getNumberOfTrianglesZ());
+                bf.write("\nset stepSize " + currentConf.getStepSize());
 
                 bf.close();
                 fw.close();

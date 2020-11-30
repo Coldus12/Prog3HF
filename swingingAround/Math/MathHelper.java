@@ -5,6 +5,11 @@ import java.util.ArrayList;
 public class MathHelper {
 
     public static double executeExpression(String expression) throws Exception {
+        if (expression.startsWith("-"))
+            expression = "0" + expression;
+
+        expression = expression.replace("(-","(0-");
+
         ArrayList<String> workable = breakUpExpression(expression);
         workable = changeSpecialCharsToValue(workable);
         workable = executeParentheses(workable,0,workable.size());
