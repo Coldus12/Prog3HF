@@ -15,7 +15,9 @@ public class MathHelper {
             System.out.println("------------------------------------------------------------------------------------------------------------------------");
             printEx(workable);
             System.out.println("------------------------------------------------------------------------------------------------------------------------");
+            //y=10*e^(0-(x^2/4-z^2/4))
             throw new Exception("Something went wrong it seems, better fix it ya dumass");
+            //return Double.parseDouble(workable.get(0));
         }
         //return 0;
     }
@@ -47,6 +49,13 @@ public class MathHelper {
                     currentNumber = "";
 
                     brokenUpExpression.add(String.valueOf(c));
+                }
+
+                if (currentStringOfChars.equals("cos") || currentStringOfChars.equals("sin") ||
+                        currentStringOfChars.equals("Cos") || currentStringOfChars.equals("Sin") ||
+                        currentStringOfChars.equals("COS") || currentStringOfChars.equals("SIN")) {
+                    brokenUpExpression.add(currentStringOfChars);
+                    currentStringOfChars = "";
                 }
 
                 if (isCharFromABC(c)) {
@@ -144,11 +153,14 @@ public class MathHelper {
 
     public static String changeSubstringToVal(String expression, String str, double val) {
 
-        if (val>0)
-            expression = expression.replace(str,""+val);
-        else {
-            expression = expression.replace(str,"(0"+val+")");
-        }
+        if (Math.abs(val) > 0.0001) {
+            if (val>0)
+                expression = expression.replace(str,""+val);
+            else {
+                expression = expression.replace(str,"(0"+val+")");
+            }
+        } else
+            expression = expression.replace(str,""+0);
 
         return expression;
     }

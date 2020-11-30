@@ -1,5 +1,6 @@
 package swingingAround.Cmd;
 
+import swingingAround.Entity;
 import swingingAround.GeoFrame;
 import swingingAround.Graph;
 
@@ -14,7 +15,7 @@ public class Console extends JTextField {
 
     public ArrayList<String> previousCmds;
     public String currentCmd = "";
-    private HashMap<String, Command> commands;
+    static private HashMap<String, Command> commands;
     private Config currentConf;
 
     public Console() {
@@ -36,6 +37,7 @@ public class Console extends JTextField {
         currentConf.setNumberOfTrianglesX(50);
         currentConf.setNumberOfTrianglesY(50);
         currentConf.setNumberOfTrianglesZ(50);
+        currentConf.setStepSize(1.0);
 
         //HashMap stuff
         //--------------------------------------------------------------------------------------------------------------
@@ -53,6 +55,12 @@ public class Console extends JTextField {
 
         commands.put("Line",new LineCommand());
         commands.put("line",new LineCommand());
+
+        commands.put("point", new PointCommand());
+        commands.put("Point", new PointCommand());
+
+        commands.put("set",new SetSizeCommand());
+        commands.put("Set",new SetSizeCommand());
     }
 
     public void setConfig(Config conf) {currentConf = conf;}
@@ -80,6 +88,19 @@ public class Console extends JTextField {
             Command cm = commands.get(cmd[0]);
             currentConf = cm.execute(cmd, currentConf);
         }
+    }
+
+    public static Config tryToExecChangedFormula(Config conf, String formula, String entityName) {
+        conf.removeEntity(entityName);
+
+        formula = formula.replace("="," ");
+        String[] cmd = formula.split("\\s+");
+        if (commands.containsKey(cmd[0])) {
+            Command cm = commands.get(cmd[0]);
+            conf = cm.execute(cmd, conf);
+        }
+
+        return conf;
     }
 
     private class cmdListener implements KeyListener {

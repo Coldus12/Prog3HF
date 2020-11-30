@@ -48,7 +48,11 @@ public class FunctionEntity extends Entity {
                 float retVal = 0;
                 try {
                     retVal = (float) MathHelper.executeExpression(tmp);
-                } catch (Exception ex) {ex.printStackTrace();}
+                } catch (Exception ex) {
+                    System.out.println(tmp);
+                    ex.printStackTrace();
+                    System.exit(0);
+                }
 
                 return retVal;
             }

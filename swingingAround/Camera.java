@@ -96,6 +96,10 @@ public class Camera {
     //Main functions
     //------------------------------------------------------------------------------------------------------------------
     public void render3DPoint(Vec3 vec) {
+        render3DPoint(vec,Color.GREEN);
+    }
+
+    public void render3DPoint(Vec3 vec, Color c) {
         dMatrix inverse = base;
         inverse = inverse.multiplyByNumber(distanceToScreen);
         inverse = inverse.getInverse();
@@ -112,7 +116,7 @@ public class Camera {
             v1b.y = screen.getHeight()/2.0 - v1b.y;
 
             try {
-                screen.drawPoint((int) v1b.x, (int) v1b.y,3, Color.GREEN);
+                screen.drawPoint((int) v1b.x, (int) v1b.y,3, c);
             } catch (Exception ex) {ex.printStackTrace();}
         }
     }

@@ -1,11 +1,15 @@
 package swingingAround;
 
+import swingingAround.Cmd.Config;
+import swingingAround.Cmd.Console;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public class EntityPanel extends JPanel {
 
@@ -15,7 +19,10 @@ public class EntityPanel extends JPanel {
     JTextField formula;
     Color color = Color.GREEN;
 
-    public EntityPanel(Entity entity) {
+    Config currentConf;
+    boolean confChanged = false;
+
+    public EntityPanel(Entity entity, Config conf) {
         String[] colors = {"Cyan","Blue","Magenta","Pink","Red","Orange","Yellow","Green","White","Lightgray","Gray","Darkgray","Black"};
         colorBox = new JComboBox<String>(colors);
         colorBox.setSelectedItem("Green");
@@ -41,54 +48,25 @@ public class EntityPanel extends JPanel {
         this.add(deleteButton);
 
         formula.addKeyListener(new FormulaListener());
+
+        currentConf = conf;
     }
 
-    //Ez eleg ronda
     public void updateEntityByFormula() {
-        String newFormula = formula.getText();
-        System.out.println(newFormula);
-        newFormula = newFormula.replace("="," ");
-        String[] brokenUp = newFormula.split("\\s+");
+        confChanged = true;
 
-        if (brokenUp[0].equals("y") || brokenUp[0].equals("x") || brokenUp[0].equals("z")) {
-            if (brokenUp.length >= 2) {
-                String former = entity.getName();
-                entity = new FunctionEntity(brokenUp);
-                entity.setName(former);
-                entity.setColor(color);
-            }
-        } else if (brokenUp[0].equals("Sphere") || brokenUp[0].equals("sphere")) {
-            if (brokenUp.length == 5) {
-                String former = entity.getName();
+        currentConf = Console.tryToExecChangedFormula(currentConf,formula.getText(), entity.getName());
+        ArrayList<Entity> entities = currentConf.getEntities();
+        entity = entities.get(entities.size()-1);
+    }
 
-                double x = Double.parseDouble(brokenUp[1]);
-                double y = Double.parseDouble(brokenUp[2]);
-                double z = Double.parseDouble(brokenUp[3]);
-                double r = Double.parseDouble(brokenUp[4]);
+    public void setConfig(Config conf) {
+        currentConf = conf;
+    }
 
-                entity = new SphereEntity(new Vec3(x,y,z),(float) r, color);
-                entity.setName(former);
-            }
-
-            //EZ szar
-            //nem adja hozza a line-okhoz
-            //es egyebkent sem bovitheto
-            //JOBB MEGOLDAS KELL
-        } else if (brokenUp[0].equals("line") || brokenUp[0].equals("Line")) {
-            if (brokenUp.length == 7) {
-                String former = entity.getName();
-
-                double x1 = Double.parseDouble(brokenUp[1]);
-                double y1 = Double.parseDouble(brokenUp[2]);
-                double z1 = Double.parseDouble(brokenUp[3]);
-                double x2 = Double.parseDouble(brokenUp[4]);
-                double y2 = Double.parseDouble(brokenUp[5]);
-                double z2 = Double.parseDouble(brokenUp[6]);
-
-                entity = new LineEntity(new Vec3(x1,y1,z1), new Vec3(x2,y2,z2), Color.GREEN);
-                entity.setName(former);
-            }
-        }
+    public Config getConf() {
+        confChanged = false;
+        return currentConf;
     }
 
     public Entity getEntity() {

@@ -106,6 +106,7 @@ public class GeoFrame extends JFrame {
         conf.setNumberOfTrianglesX(50);
         conf.setNumberOfTrianglesY(50);
         conf.setNumberOfTrianglesZ(50);
+        conf.setStepSize(1);
         cmdLine.setConfig(conf);
 
         //conf.setGraphingTrianglesFilled(true);
@@ -150,7 +151,7 @@ public class GeoFrame extends JFrame {
     private void updateConfigPanel() {
         ArrayList<Entity> entities = conf.getEntities();
         if (entities.size() > entityPanels.size()) {
-            entityPanels.add(new EntityPanel(entities.get(entities.size()-1)));
+            entityPanels.add(new EntityPanel(entities.get(entities.size()-1),conf));
             entityPanels.get(entityPanels.size()-1).setAlignmentX(Component.CENTER_ALIGNMENT);
             configPanel.add(entityPanels.get(entityPanels.size()-1));
             configPanel.repaint();
@@ -164,6 +165,11 @@ public class GeoFrame extends JFrame {
 
             conf.updateEntity(current.getEntity());
             if (!current.hasEntity()) {
+                if (current.confChanged)
+                    conf = current.getConf();
+                else
+                    current.setConfig(conf);
+
                 configPanel.remove(current);
                 entityPanels.remove(i);
                 configPanel.updateUI();
@@ -179,7 +185,23 @@ public class GeoFrame extends JFrame {
         cam.screen.fillRectangle(0,0,cam.screen.getWidth(), cam.screen.getHeight(), new Color(30,30,30));
         ArrayList<LineEntity> lines = conf.getLines();
 
+        float stepSize = (float) conf.getStepSize();
+
+        double xInLoop = conf.getNumberOfTrianglesX()/2.0 * stepSize;
+        double yInLoop = conf.getNumberOfTrianglesY()/2.0 * stepSize;
+        double zInLoop = conf.getNumberOfTrianglesZ()/2.0 * stepSize;
+
         if (conf.isGraphingEnabled()) {
+
+            //Points
+            //----------------------------------------------------------------------------------------------------------
+            ArrayList<PointEntity> points = conf.getPoints();
+            for (PointEntity p: points) {
+                cam.render3DPoint(p.getPoint(), p.getColor());
+            }
+
+            //Lines
+            //----------------------------------------------------------------------------------------------------------
             //Kezdo lambda
             for (LineEntity line: lines) {
                 double lambda = (cam.getPos().x) / line.getDirection().x - (conf.getNumberOfTrianglesX());
@@ -197,79 +219,104 @@ public class GeoFrame extends JFrame {
 
             //X
             //--------------------------------------------------------------------------------------------------
-            for (int j = (int)  (cam.getPos().y - (conf.getNumberOfTrianglesY()/2)); j < (int) (cam.getPos().y + (conf.getNumberOfTrianglesY()/2)); j++) {
-                for (int k = (int) (cam.getPos().z - (conf.getNumberOfTrianglesZ()/2)); k < (int) (cam.getPos().z + (conf.getNumberOfTrianglesZ()/2)); k++) {
+            float currentX = (float) (cam.getPos().x - xInLoop);
+            float currentY = (float) (cam.getPos().y - yInLoop);
+            float currentZ = (float) (cam.getPos().z - zInLoop);
+
+            for (int j = 0; j < conf.getNumberOfTrianglesY(); j++) {
+                currentY += stepSize;
+                for (int k = 0; k < conf.getNumberOfTrianglesZ(); k++) {
+                    currentZ += stepSize;
+
                     for (Mathfunction mf: mfs) {
 
                         if (mf.getCurrentAxis() == Mathfunction.Axis.x) {
-                            double x1 = mf.exec3DFunction(0, j, k);
-                            double x2 = mf.exec3DFunction(0, j + 1, k);
-                            double x3 = mf.exec3DFunction(0, j + 1, k + 1);
-                            double x4 = mf.exec3DFunction(0, j, k + 1);
+                            double x1 = mf.exec3DFunction(0, currentY, currentZ);
+                            double x2 = mf.exec3DFunction(0, currentY + stepSize, currentZ);
+                            double x3 = mf.exec3DFunction(0, currentY + stepSize, currentZ + stepSize);
+                            double x4 = mf.exec3DFunction(0, currentY, currentZ + stepSize);
 
                             if (conf.getGraphingTrianglesFilled()) {
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x2,j+1,k),new Vec3(x3,j+1,k+1),mf.getColor()));
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x4,j,k+1),new Vec3(x3,j+1,k+1),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x2,currentY+stepSize,currentZ),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x4,currentY,currentZ+stepSize),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
                             } else {
-                                cam.render3DTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x2,j+1,k),new Vec3(x3,j+1,k+1),mf.getColor()));
-                                cam.render3DTriangle(new Triangle(new Vec3(x1,j,k),new Vec3(x4,j,k+1),new Vec3(x3,j+1,k+1),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x2,currentY+stepSize,currentZ),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x4,currentY,currentZ+stepSize),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
                             }
                         }
 
                     }
                 }
+                currentZ = (float) (cam.getPos().z - zInLoop);
             }
 
             //Y
             //--------------------------------------------------------------------------------------------------
-            for (int i = (int)  (cam.getPos().x - (conf.getNumberOfTrianglesX()/2)); i < (int) (cam.getPos().x + (conf.getNumberOfTrianglesX()/2)); i++) {
-                for (int k = (int) (cam.getPos().z - (conf.getNumberOfTrianglesZ()/2)); k < (int) (cam.getPos().z + (conf.getNumberOfTrianglesZ()/2)); k++) {
+            currentX = (float) (cam.getPos().x - xInLoop);
+            currentY = (float) (cam.getPos().y - yInLoop);
+            currentZ = (float) (cam.getPos().z - zInLoop);
+
+            for (int i = 0; i < conf.getNumberOfTrianglesX(); i++) {
+                currentX += stepSize;
+                for (int k = 0; k < conf.getNumberOfTrianglesZ(); k++) {
+                    currentZ += stepSize;
+
                     for (Mathfunction mf: mfs) {
 
                         if (mf.getCurrentAxis() == Mathfunction.Axis.y) {
-                            double y1 = mf.exec3DFunction(i,0,k);
-                            double y2 = mf.exec3DFunction(i + 1,0,k);
-                            double y3 = mf.exec3DFunction(i + 1,0,k + 1);
-                            double y4 = mf.exec3DFunction(i,0,k + 1);
+                            double y1 = mf.exec3DFunction(currentX,0,currentZ);
+                            double y2 = mf.exec3DFunction(currentX + stepSize,0,currentZ);
+                            double y3 = mf.exec3DFunction(currentX + stepSize,0,currentZ + stepSize);
+                            double y4 = mf.exec3DFunction(currentX,0,currentZ + stepSize);
 
                             if (conf.getGraphingTrianglesFilled()) {
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i+1,y2,k),new Vec3(i+1,y3,k+1),mf.getColor()));
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i,y4,k+1),new Vec3(i+1,y3,k+1),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX+stepSize,y2,currentZ),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX,y4,currentZ+stepSize),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
                             } else {
-                                cam.render3DTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i+1,y2,k),new Vec3(i+1,y3,k+1),mf.getColor()));
-                                cam.render3DTriangle(new Triangle(new Vec3(i,y1,k),new Vec3(i,y4,k+1),new Vec3(i+1,y3,k+1),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX+stepSize,y2,currentZ),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX,y4,currentZ+stepSize),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
                             }
                         }
 
                     }
                 }
+                currentZ = (float) (cam.getPos().z - zInLoop);
             }
 
             //Z
             //--------------------------------------------------------------------------------------------------
-            for (int i = (int)  (cam.getPos().x - (conf.getNumberOfTrianglesX()/2)); i < (int) (cam.getPos().x + (conf.getNumberOfTrianglesX()/2)); i++) {
-                for (int j = (int) (cam.getPos().y - (conf.getNumberOfTrianglesY()/2)); j < (int) (cam.getPos().y + (conf.getNumberOfTrianglesY()/2)); j++) {
+            currentX = (float) (cam.getPos().x - xInLoop);
+            currentY = (float) (cam.getPos().y - yInLoop);
+            currentZ = (float) (cam.getPos().z - zInLoop);
+
+            for (int i = 0; i < conf.getNumberOfTrianglesX(); i++) {
+                currentX += stepSize;
+                for (int j = 0; j < conf.getNumberOfTrianglesY(); j++) {
+                    currentY += stepSize;
+
                     for (Mathfunction mf: mfs) {
 
                         if (mf.getCurrentAxis() == Mathfunction.Axis.z) {
-                            double z1 = mf.exec3DFunction(i,j,0);
-                            double z2 = mf.exec3DFunction(i + 1,j,0);
-                            double z3 = mf.exec3DFunction(i + 1,j + 1,0);
-                            double z4 = mf.exec3DFunction(i,j + 1,0);
+                            double z1 = mf.exec3DFunction(currentX,currentY,0);
+                            double z2 = mf.exec3DFunction(currentX + stepSize,currentY,0);
+                            double z3 = mf.exec3DFunction(currentX + stepSize,currentY + stepSize,0);
+                            double z4 = mf.exec3DFunction(currentX,currentY + stepSize,0);
 
                             if (conf.getGraphingTrianglesFilled()) {
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i+1,j,z2),new Vec3(i+1,j+1,z3),mf.getColor()));
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i,j+1,z4),new Vec3(i+1,j+1,z3),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX+stepSize,currentY,z2),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX,currentY+stepSize,z4),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
                             } else {
-                                cam.render3DTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i+1,j,z2),new Vec3(i+1,j+1,z3),mf.getColor()));
-                                cam.render3DTriangle(new Triangle(new Vec3(i,j,z1),new Vec3(i,j+1,z4),new Vec3(i+1,j+1,z3),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX+stepSize,currentY,z2),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX,currentY+stepSize,z4),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
                             }
                         }
 
                     }
                 }
+                currentY = (float) (cam.getPos().y - yInLoop);
             }
         }
+
         renderPanel.setScreen(cam.getScreen());
         renderPanel.repaint();
 
@@ -322,7 +369,7 @@ public class GeoFrame extends JFrame {
 
                 case KeyEvent.VK_W:
                     if (cam == null)
-                        System.out.println("Fuck nigga");
+                        System.out.println("Oh no");
                     else
                         cam.setPos(new Vec3(cam.getPos().x,cam.getPos().y,cam.getPos().z+=1));
                     break;
