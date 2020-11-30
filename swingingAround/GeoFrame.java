@@ -159,6 +159,7 @@ public class GeoFrame extends JFrame {
                 entityPanels.get(i).setAlignmentX(Component.CENTER_ALIGNMENT);
                 configPanel.add(entityPanels.get(i));
             }
+            conf.setFreshlyLoadedFromFile(false);
         } else {
             if (entities.size() > entityPanels.size()) {
                 entityPanels.add(new EntityPanel(entities.get(entities.size()-1),conf));
