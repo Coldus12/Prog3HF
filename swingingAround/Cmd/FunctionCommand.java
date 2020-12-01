@@ -6,7 +6,6 @@ public class FunctionCommand implements Command {
     @Override
     public Config execute(String[] cmd, Config conf) {
         if (cmd.length >= 2) {
-            //System.out.println("here");
             conf.addEntity(new FunctionEntity(cmd));
         }
 

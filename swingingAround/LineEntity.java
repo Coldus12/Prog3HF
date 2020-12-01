@@ -1,8 +1,5 @@
 package swingingAround;
 
-import swingingAround.Entity;
-import swingingAround.Mathfunction;
-
 import java.awt.*;
 
 public class LineEntity extends Entity {

@@ -6,7 +6,6 @@ import swingingAround.PointEntity;
 import swingingAround.Vec3;
 
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class LineCommand implements Command {
@@ -20,11 +19,7 @@ public class LineCommand implements Command {
             double y2 = Double.parseDouble(cmd[5]);
             double z2 = Double.parseDouble(cmd[6]);
 
-            //LineEntity entity = new LineEntity(new Vec3(x1,y1,z1), new Vec3(x2,y2,z2), Color.GREEN);
-
-            //conf.addEntity(new LineEntity(new Vec3(x1,y1,z1), new Vec3(x2,y2,z2), Color.GREEN));
             conf.addLine(new LineEntity(new Vec3(x1,y1,z1), new Vec3(x2,y2,z2), Color.GREEN));
-            //conf.addLine((LineEntity) conf.getEntities().get(conf.getEntities().size()-1));
         }
 
         if (cmd.length == 3) {

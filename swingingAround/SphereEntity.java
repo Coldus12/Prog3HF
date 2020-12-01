@@ -6,7 +6,7 @@ public class SphereEntity extends Entity {
     private static int number;
 
     private Color color;
-    private Mathfunction mf1,mf2, mf3, mf4;
+    private final Mathfunction mf1,mf2, mf3, mf4;
     private Vec3 center;
     private float radius;
 

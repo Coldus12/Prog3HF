@@ -14,4 +14,8 @@ public class Triangle {
         this.c = c;
     }
 
+    public String toString() {
+        return v1 + " " + v2 + " " + v3 + " Color: " + c.getAlpha() + " " + c.getRed() + " " + c.getGreen() + " " + c.getBlue();
+    }
+
 }

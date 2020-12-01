@@ -18,32 +18,23 @@ import static java.lang.Thread.sleep;
 
 public class GeoFrame extends JFrame {
 
-    /**ArrayList az entitypanelből,
-     * mindegyik elemhez egy entityt adunk
-     * remélhetőleg működik..
-    * */
-    private PaintPanel renderPanel;
-    //private JPanel panel;
-    private JPanel configPanel;
-    private Camera cam;
-    //private JTextField cmdLine;
-    private Console cmdLine;
+    private final PaintPanel renderPanel;
+    private final JPanel configPanel;
+    private final Camera cam;
+    private final Console cmdLine;
     private Config conf;
     private boolean running = true;
     private ArrayList<EntityPanel> entityPanels;
-    private JMenuBar menuBar;
-    private GeoSaveAsMenu saveAsMenu;
-    private GeoStandardSaveMenu standardSaveMenu;
-    private GeoOpenFileMenu openFileMenu;
+    private final JMenuBar menuBar;
+    private final GeoSaveAsMenu saveAsMenu;
+    private final GeoStandardSaveMenu standardSaveMenu;
+    private final GeoOpenFileMenu openFileMenu;
 
-    private boolean test = false;
 
     public GeoFrame() {
-        //this.setSize(1080,720);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setEnabled(true);
         this.setBounds(0,0,1350,775);
-        //this.setVisible(true);
         this.setResizable(false);
         this.setLayout(new GridBagLayout());
         this.setTitle("GeoCopy");
@@ -101,15 +92,6 @@ public class GeoFrame extends JFrame {
         //Config
         //--------------------------------------------------------------------------------------------------------------
         conf = new Config();
-        conf.setGraphingTrianglesFilled(false);
-        conf.setGraphingEnabled(true);
-        conf.setNumberOfTrianglesX(50);
-        conf.setNumberOfTrianglesY(50);
-        conf.setNumberOfTrianglesZ(50);
-        conf.setStepSize(1);
-        cmdLine.setConfig(conf);
-
-        //conf.setGraphingTrianglesFilled(true);
 
         //Menu
         //--------------------------------------------------------------------------------------------------------------
@@ -124,16 +106,13 @@ public class GeoFrame extends JFrame {
 
         //Updating UI
         //--------------------------------------------------------------------------------------------------------------
-        //this.setVisible(false);
         this.setVisible(true);
 
         //Main loop?
         //--------------------------------------------------------------------------------------------------------------
-        //!TODO
-        //Kicerelni itt sok mindent draw functionre
-        //Megjavitani a draw-t, hogy csak a teglatesten belul abrazoljon cuccokat.
         while (running) {
             try {
+                long time = System.currentTimeMillis();
                 conf = cmdLine.getConfig();
                 loadingOpenedConfig();
                 updateConfigPanel();
@@ -141,9 +120,15 @@ public class GeoFrame extends JFrame {
                 standardSaveMenu.updateConf(conf);
                 saveAsMenu.updateConf(conf);
                 draw();
-
-                sleep(50);
-            } catch (Exception ex) {}
+                long time2 = System.currentTimeMillis();
+                long delta = time2 - time;
+                if (delta <= 50)
+                    sleep(50 - delta);
+                else
+                    sleep(50);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -175,7 +160,6 @@ public class GeoFrame extends JFrame {
     private void updateEntities() {
         for (int i = 0; i < entityPanels.size(); i++) {
             EntityPanel current = entityPanels.get(i);
-            //System.out.println("Name: " + current.getEntity().getName() + " ID: " + current.getEntity().getId());
 
             conf.updateEntity(current.getEntity());
             if (!current.hasEntity()) {
@@ -228,15 +212,12 @@ public class GeoFrame extends JFrame {
             //Kezdo lambda
             for (LineEntity line: lines) {
                 double lambda = (cam.getPos().x) / line.getDirection().x - (conf.getNumberOfTrianglesX());
-                //System.out.println("EY");
 
                 for (int i = (int) lambda; i < (int) (lambda + (conf.getNumberOfTrianglesX())); i++) {
                     Vec3 p1 = line.calcPartOfLine(i);
                     Vec3 p2 = line.calcPartOfLine(i+1);
 
                     cam.render3DLine(p1, p2, line.getColor());
-                    //cam.render3DLine(new Vec3(0,0,0), new Vec3(10,10,10),Color.BLACK);
-                    //System.out.println("Eh?");
                 }
             }
 
@@ -387,36 +368,56 @@ public class GeoFrame extends JFrame {
                 case KeyEvent.VK_ESCAPE:
                     running = false;
                     getFrame().dispose();
-                    //sSystem.exit(0);
                     break;
 
                 case KeyEvent.VK_W:
-                    if (cam == null)
-                        System.out.println("Oh no");
-                    else
-                        cam.setPos(new Vec3(cam.getPos().x,cam.getPos().y,cam.getPos().z+=1));
+                    cam.getPos().moveZByDelta(1);
                     break;
                 case KeyEvent.VK_S:
-                    cam.setPos(new Vec3(cam.getPos().x,cam.getPos().y,cam.getPos().z-=1));
+                    cam.getPos().moveZByDelta(-1);
                     break;
                 case KeyEvent.VK_A:
-                    cam.setPos(new Vec3(cam.getPos().x-=1,cam.getPos().y,cam.getPos().z));
+                    cam.getPos().moveXbyDelta(-1);
                     break;
                 case KeyEvent.VK_D:
-                    //cam.getPos();
-                    //cam.setPos(cam.getPos());
-                    cam.setPos(new Vec3(cam.getPos().x+=1,cam.getPos().y,cam.getPos().z));
+                    cam.getPos().moveXbyDelta(1);
                     break;
                 case KeyEvent.VK_U:
-                    cam.setPos(new Vec3(cam.getPos().x,cam.getPos().y+=1,cam.getPos().z));
+                    cam.getPos().moveYByDelta(1);
+                    break;
+                case KeyEvent.VK_J:
+                    cam.getPos().moveYByDelta(-1);
+                    break;
 
+                //Camera rotations
+                //------------------------------------------------------------------------------------------------------
+                case KeyEvent.VK_Q:
+                    cam.setBase(cam.getBase().multiplyByMatrix(RotMatrices.rotateYByDegree(1)));
+                    break;
+
+                case KeyEvent.VK_E:
+                    cam.setBase(cam.getBase().multiplyByMatrix(RotMatrices.rotateYByDegree(-1)));
+                    break;
+
+                case KeyEvent.VK_F:
+                    cam.setBase(cam.getBase().multiplyByMatrix(RotMatrices.rotateXByDegree(1)));
+                    break;
+
+                case KeyEvent.VK_R:
+                    cam.setBase(cam.getBase().multiplyByMatrix(RotMatrices.rotateXByDegree(-1)));
+                    break;
+
+                case KeyEvent.VK_Y:
+                    cam.setBase(cam.getBase().multiplyByMatrix(RotMatrices.rotateZByDegree(1)));
+                    break;
+
+                case KeyEvent.VK_X:
+                    cam.setBase(cam.getBase().multiplyByMatrix(RotMatrices.rotateZByDegree(-1)));
                     break;
 
                 default:
-                    //renderPanel.drawTriangle(0,0,10,10,30,40,Color.GREEN);
                     System.out.println(cam.getPos());
                     renderPanel.repaint();
-                    //defualt();
                     break;
             }
         }

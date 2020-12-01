@@ -35,49 +35,14 @@ public class GeoSaveAsMenu extends JMenuItem {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            chooser.setFileFilter(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    if (file.getName().endsWith(".ggk"))
-                        return true;
-
-                    if (file.isDirectory())
-                        return true;
-                    return false;
-                }
-
-                @Override
-                public String getDescription() {
-                    return null;
-                }
-            });
+            chooser.setFileFilter(new GgkFilter());
 
             int returnVal = chooser.showSaveDialog(GeoSaveAsMenu.this);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 chosenFile = chooser.getSelectedFile();
-                ArrayList<Entity> entities = currentConf.getEntities();
 
-                try {
-                    if (!chosenFile.getName().endsWith(".ggk"))
-                        chosenFile = new File(chosenFile.getPath() + ".ggk");
-
-                    FileWriter fw = new FileWriter(chosenFile);
-                    BufferedWriter bf = new BufferedWriter(fw);
-                    Vec3 cam = currentConf.getCamPos();
-                    bf.write(cam.x + " " + cam.y + " " + cam.z);
-
-                    for (Entity n: entities)
-                        bf.write("\n"+n.getFormula() + " : " + n.getName());
-
-                    bf.write("\nset width " + currentConf.getNumberOfTrianglesX());
-                    bf.write("\nset height " + currentConf.getNumberOfTrianglesY());
-                    bf.write("\nset length " + currentConf.getNumberOfTrianglesZ());
-                    bf.write("\nset stepSize " + currentConf.getStepSize());
-
-                    bf.close();
-                    fw.close();
-                } catch (IOException ex) {ex.printStackTrace();}
+                SaveGGK save = new SaveGGK(chosenFile, currentConf);
             }
         }
     }

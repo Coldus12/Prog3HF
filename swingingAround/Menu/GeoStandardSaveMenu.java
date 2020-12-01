@@ -39,25 +39,7 @@ public class GeoStandardSaveMenu extends JMenuItem {
                 saveFile = new File(wd.getPath() + File.separatorChar + "klon" + i + ".ggk");
             }
 
-            ArrayList<Entity> entities = currentConf.getEntities();
-
-            try {
-                FileWriter fw = new FileWriter(saveFile);
-                BufferedWriter bf = new BufferedWriter(fw);
-                Vec3 cam = currentConf.getCamPos();
-                bf.write(cam.x + " " + cam.y + " " + cam.z);
-
-                for (Entity n: entities)
-                    bf.write("\n"+n.getFormula() + " : " + n.getName());
-
-                bf.write("\nset width " + currentConf.getNumberOfTrianglesX());
-                bf.write("\nset height " + currentConf.getNumberOfTrianglesY());
-                bf.write("\nset length " + currentConf.getNumberOfTrianglesZ());
-                bf.write("\nset stepSize " + currentConf.getStepSize());
-
-                bf.close();
-                fw.close();
-            } catch (IOException ex) {ex.printStackTrace();}
+            SaveGGK save = new SaveGGK(saveFile, currentConf);
         }
     }
 }

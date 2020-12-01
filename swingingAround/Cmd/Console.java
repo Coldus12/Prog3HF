@@ -69,42 +69,18 @@ public class Console extends JTextField {
         this.setText("");
 
         System.out.println(currentCmd);
-
-        String formulaCopy = currentCmd;
-
-        if (currentCmd.contains(":"))
-            currentCmd = currentCmd.substring(0,currentCmd.indexOf(":"));
-
-        currentCmd = currentCmd.replace("="," ");
-
-        String[] cmd = currentCmd.split("\\s+");
-        if (commands.containsKey(cmd[0])) {
-            Command cm = commands.get(cmd[0]);
-            currentConf = cm.execute(cmd, currentConf);
-            checkNameChange(formulaCopy);
-        }
+        tryToExecFormula(currentCmd);
     }
 
     public void tryToExecFormula(String formula) {
-        String formulaCopy = formula;
-
-        if (formula.contains(":"))
-            formula = formula.substring(0,formula.indexOf(":"));
-
-        formula = formula.replace("="," ");
-        String[] cmd = formula.split("\\s+");
-
-        if (commands.containsKey(cmd[0])) {
-            Command cm = commands.get(cmd[0]);
-            currentConf = cm.execute(cmd, currentConf);
-            checkNameChange(formulaCopy);
-        }
+        currentConf = tryToExecChangedFormula(currentConf, formula, null);
     }
 
     public static Config tryToExecChangedFormula(Config conf, String formula, String entityId) {
         String formulaCopy = formula;
 
-        conf.removeEntity(entityId);
+        if (entityId != null)
+            conf.removeEntity(entityId);
 
         if (formula.contains(":"))
             formula = formula.substring(0,formula.indexOf(":"));

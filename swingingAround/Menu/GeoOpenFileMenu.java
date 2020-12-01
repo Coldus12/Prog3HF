@@ -26,7 +26,6 @@ public class GeoOpenFileMenu extends JMenuItem {
         this.addActionListener(new Openlistener());
     }
 
-    //public void updateConf(Config newerConf) {currentConf = newerConf;}
     public Config getConfig(Config conf) {
         if (openedAFile) {
 
@@ -35,7 +34,6 @@ public class GeoOpenFileMenu extends JMenuItem {
                 System.out.println(n.getFormula());
             }
 
-            System.out.println("here we are mate");
             openedAFile = false;
             return currentConf;
         } else
@@ -46,69 +44,65 @@ public class GeoOpenFileMenu extends JMenuItem {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            chooser.setFileFilter(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    if (file.getName().endsWith(".ggk"))
-                        return true;
-
-                    if (file.isDirectory())
-                        return true;
-                    return false;
-                }
-
-                @Override
-                public String getDescription() {
-                    return null;
-                }
-            });
+            chooser.setFileFilter(new GgkFilter());
 
             int returnVal = chooser.showOpenDialog(GeoOpenFileMenu.this);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 chosenFile = chooser.getSelectedFile();
-                String line = "";
 
-                try {
-                    if (chosenFile.getName().endsWith(".ggk")) {
-                        Console console = new Console();
-                        FileReader fr = new FileReader(chosenFile);
-                        BufferedReader bf = new BufferedReader(fr);
-
-                        currentConf = new Config();
-                        currentConf.setGraphingTrianglesFilled(false);
-                        currentConf.setGraphingEnabled(true);
-                        currentConf.setNumberOfTrianglesX(50);
-                        currentConf.setNumberOfTrianglesY(50);
-                        currentConf.setNumberOfTrianglesZ(50);
-
-                        console.setConfig(currentConf);
-
-                        line = bf.readLine();
-                        String[] coords = line.split(" ");
-                        double posX = Double.parseDouble(coords[0]);
-                        double posY = Double.parseDouble(coords[1]);
-                        double posZ = Double.parseDouble(coords[2]);
-                        Vec3 camPos = new Vec3(posX,posY,posZ);
-
-                        currentConf.setCamPos(camPos);
-                        //System.out.println("CurrentConf" + currentConf.getCamPos());
-
-                        while ((line = bf.readLine()) != null) {
-                            console.tryToExecFormula(line);
-                        }
-
-                        currentConf = console.getConfig();
-                        currentConf.setFreshlyLoadedFromFile(true);
-                        openedAFile = true;
-
-                        System.out.println("done reading a file");
-                        bf.close();
-                        fr.close();
-                    }
-                } catch (IOException ex) {ex.printStackTrace();}
+                currentConf = openGgkFile(chosenFile);
+                if (currentConf != null)
+                    openedAFile = true;
             }
         }
+    }
+
+    public static Config openGgkFile(File openedFile) {
+        String line = "";
+        Config conf = null;
+
+        try {
+            if (openedFile.getName().endsWith(".ggk")) {
+                Console console = new Console();
+                FileReader fr = new FileReader(openedFile);
+                BufferedReader bf = new BufferedReader(fr);
+
+                conf = new Config();
+                conf.setGraphingTrianglesFilled(false);
+                conf.setGraphingEnabled(true);
+                conf.setNumberOfTrianglesX(50);
+                conf.setNumberOfTrianglesY(50);
+                conf.setNumberOfTrianglesZ(50);
+
+                console.setConfig(conf);
+
+                line = bf.readLine();
+                String[] coords = line.split(" ");
+                double posX = Double.parseDouble(coords[0]);
+                double posY = Double.parseDouble(coords[1]);
+                double posZ = Double.parseDouble(coords[2]);
+                Vec3 camPos = new Vec3(posX,posY,posZ);
+
+                conf.setCamPos(camPos);
+
+                while ((line = bf.readLine()) != null) {
+                    console.tryToExecFormula(line);
+                }
+
+                conf = console.getConfig();
+                conf.setFreshlyLoadedFromFile(true);
+
+                System.out.println("done reading a file");
+                bf.close();
+                fr.close();
+            }
+        } catch (IOException ex) {
+            System.err.println("Something went wrong while opening file: " + openedFile.getName() + "\nPath: " + openedFile.getPath());
+            ex.printStackTrace();
+        }
+
+        return conf;
     }
 
 }

@@ -1,10 +1,8 @@
 package swingingAround;
 
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import swingingAround.Math.MathHelper;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class FunctionEntity extends Entity {
 
@@ -27,7 +25,6 @@ public class FunctionEntity extends Entity {
                 System.arraycopy(function,1,strTmp,0,function.length-1);
 
                 String tmp = MathHelper.putTogether(strTmp);
-                //System.out.println(tmp+" THIS THE TEMP");
 
                 tmp = MathHelper.changeSubstringToVal(tmp,"x",x);
                 tmp = MathHelper.changeSubstringToVal(tmp,"y",y);
@@ -36,11 +33,6 @@ public class FunctionEntity extends Entity {
                 tmp = MathHelper.changeSubstringToVal(tmp,"X",x);
                 tmp = MathHelper.changeSubstringToVal(tmp,"Y",y);
                 tmp = MathHelper.changeSubstringToVal(tmp,"Z",z);
-
-                //System.out.println(tmp+" THIS THE CHANGED");
-
-                //System.out.println("--------------------------------------------------------------------------------------");
-                //MathHelper.printEx(tmp);
 
                 float retVal = 0;
                 try {
@@ -55,7 +47,6 @@ public class FunctionEntity extends Entity {
             }
         };
 
-        //System.exit(0);
         mf.setColor(color);
 
         switch (function[0]) {

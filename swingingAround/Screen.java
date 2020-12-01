@@ -73,6 +73,16 @@ public class Screen {
         g.dispose();
     }
 
+    public void drawTriangle(Triangle tri) {
+        if (tri != null) {
+            Vec3 v1 = tri.v1;
+            Vec3 v2 = tri.v2;
+            Vec3 v3 = tri.v3;
+
+            drawTriangle((int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y, (int) v3.x, (int) v3.y, tri.c);
+        }
+    }
+
     public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3, Color c) {
 
         int[] xs = {x1, x2, x3};
@@ -84,17 +94,28 @@ public class Screen {
         g.dispose();
     }
 
+    public void fillTriangle(Triangle tri) {
+        if (tri != null) {
+            Vec3 v1 = tri.v1;
+            Vec3 v2 = tri.v2;
+            Vec3 v3 = tri.v3;
+
+            fillTriangle((int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y, (int) v3.x, (int) v3.y, tri.c);
+        }
+    }
+
     public void drawRectangle(int x1, int y1, int width, int height, Color c) {
-        drawLine(x1, y1,x1 + width, y1, c);
-        drawLine(x1, y1, x1, y1 + height, c);
-        drawLine(x1 + width, y1, x1 + width, y1 + height, c);
-        drawLine(x1, y1 + height, x1 + width, y1 + height, c);
+        Graphics2D g = (Graphics2D) matrix.getGraphics();
+        g.setColor(c);
+        g.drawRect(x1,y1,width,height);
+        g.dispose();
     }
 
     public void fillRectangle(int x1, int y1, int width, int height, Color c) {
         Graphics2D g = (Graphics2D) matrix.getGraphics();
         g.setColor(c);
         g.fillRect(x1,y1,width,height);
+        g.dispose();
     }
 
 }

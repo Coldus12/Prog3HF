@@ -8,8 +8,9 @@ public class Camera {
     private double distanceToScreen;
     private double fov;
 
-    private double degree = Math.PI/180;
     private dMatrix base;
+    private dMatrix inverseBase;
+    private boolean hasBasedChanged = true;
 
     public Camera(int width, int height, Vec3 pos, Vec3 direction, double FOV) {
         this.pos = pos;
@@ -46,6 +47,7 @@ public class Camera {
     public void setBase(dMatrix newBase) {
         if ((newBase.getWidth() == 3) && (newBase.getHeight() == 3)) {
             base = newBase;
+            hasBasedChanged = true;
         }
     }
 
@@ -99,14 +101,55 @@ public class Camera {
         render3DPoint(vec,Color.GREEN);
     }
 
+    private void calcInverse() {
+        if (hasBasedChanged) {
+
+            inverseBase = base;
+            inverseBase = inverseBase.multiplyByNumber(distanceToScreen);
+            inverseBase = inverseBase.getInverse();
+
+            hasBasedChanged = false;
+        }
+    }
+
+    private Triangle calcProjectedTrianglesCoordinates(Triangle tri) {
+        calcInverse();
+
+        Vec3 v1b = tri.v1.multiplyVec3ByMatrix(inverseBase);
+        Vec3 v2b = tri.v2.multiplyVec3ByMatrix(inverseBase);
+        Vec3 v3b = tri.v3.multiplyVec3ByMatrix(inverseBase);
+
+        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverseBase);
+
+        v1b = new Vec3(v1b.x - camPos.x, v1b.y - camPos.y, v1b.z - camPos.z);
+        v2b = new Vec3(v2b.x - camPos.x, v2b.y - camPos.y, v2b.z - camPos.z);
+        v3b = new Vec3(v3b.x - camPos.x, v3b.y - camPos.y, v3b.z - camPos.z);
+
+        if ((v1b.z > 0) && (v2b.z  > 0) && (v3b.z > 0)) {
+            v1b.multiplyByNumber((distanceToScreen)/(v1b.z));
+            v2b.multiplyByNumber((distanceToScreen)/(v2b.z));
+            v3b.multiplyByNumber((distanceToScreen)/(v3b.z));
+
+            v1b.x += screen.getWidth()/2.0;
+            v2b.x += screen.getWidth()/2.0;
+            v3b.x += screen.getWidth()/2.0;
+
+            v1b.y = screen.getHeight()/2.0 - v1b.y;
+            v2b.y = screen.getHeight()/2.0 - v2b.y;
+            v3b.y = screen.getHeight()/2.0 - v3b.y;
+
+            return new Triangle(v1b,v2b,v3b,tri.c);
+        } else {
+            return null;
+        }
+    }
+
     public void render3DPoint(Vec3 vec, Color c) {
-        dMatrix inverse = base;
-        inverse = inverse.multiplyByNumber(distanceToScreen);
-        inverse = inverse.getInverse();
+        calcInverse();
 
-        Vec3 v1b = vec.multiplyVec3ByMatrix(inverse);
+        Vec3 v1b = vec.multiplyVec3ByMatrix(inverseBase);
 
-        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverse);
+        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverseBase);
 
         v1b = new Vec3(v1b.x - camPos.x, v1b.y - camPos.y, v1b.z - camPos.z);
 
@@ -122,94 +165,22 @@ public class Camera {
     }
 
     public void render3DTriangle(Triangle tri) {
-        dMatrix inverse = base;
-        inverse = inverse.multiplyByNumber(distanceToScreen);
-        inverse = inverse.getInverse();
-
-        Vec3 v1b = tri.v1.multiplyVec3ByMatrix(inverse);
-        Vec3 v2b = tri.v2.multiplyVec3ByMatrix(inverse);
-        Vec3 v3b = tri.v3.multiplyVec3ByMatrix(inverse);
-
-        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverse);
-        //Vec3 camPos = getPos();
-
-        v1b = new Vec3(v1b.x - camPos.x, v1b.y - camPos.y, v1b.z - camPos.z);
-        v2b = new Vec3(v2b.x - camPos.x, v2b.y - camPos.y, v2b.z - camPos.z);
-        v3b = new Vec3(v3b.x - camPos.x, v3b.y - camPos.y, v3b.z - camPos.z);
-
-        if ((v1b.z > 0) && (v2b.z  > 0) && (v3b.z > 0)) {
-            v1b.multiplyByNumber((distanceToScreen)/(v1b.z));
-            v2b.multiplyByNumber((distanceToScreen)/(v2b.z));
-            v3b.multiplyByNumber((distanceToScreen)/(v3b.z));
-
-            v1b.x += screen.getWidth()/2.0;
-            v2b.x += screen.getWidth()/2.0;
-            v3b.x += screen.getWidth()/2.0;
-
-            v1b.y = screen.getHeight()/2.0 - v1b.y;
-            v2b.y = screen.getHeight()/2.0 - v2b.y;
-            v3b.y = screen.getHeight()/2.0 - v3b.y;
-
-            try {
-                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, new Color(90,90,9));
-                screen.drawTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
-                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
-                //screen.setColorAt((int) v1b.x, (int) v1b.y,Color.CYAN);
-                //screen.setColorAt((int) v2b.x, (int) v2b.y,Color.CYAN);
-                //screen.setColorAt((int) v3b.x, (int) v3b.y,Color.CYAN);
-            } catch (Exception ex) {ex.printStackTrace();}
-        }
+        tri = calcProjectedTrianglesCoordinates(tri);
+        screen.drawTriangle(tri);
     }
 
     public void render3DFilledTriangle(Triangle tri) {
-        dMatrix inverse = base;
-        inverse = inverse.multiplyByNumber(distanceToScreen);
-        inverse = inverse.getInverse();
-
-        Vec3 v1b = tri.v1.multiplyVec3ByMatrix(inverse);
-        Vec3 v2b = tri.v2.multiplyVec3ByMatrix(inverse);
-        Vec3 v3b = tri.v3.multiplyVec3ByMatrix(inverse);
-
-        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverse);
-
-        v1b = new Vec3(v1b.x - camPos.x, v1b.y - camPos.y, v1b.z - camPos.z);
-        v2b = new Vec3(v2b.x - camPos.x, v2b.y - camPos.y, v2b.z - camPos.z);
-        v3b = new Vec3(v3b.x - camPos.x, v3b.y - camPos.y, v3b.z - camPos.z);
-
-        if ((v1b.z > 0) && (v2b.z  > 0) && (v3b.z > 0)) {
-            v1b.multiplyByNumber((distanceToScreen)/(v1b.z));
-            v2b.multiplyByNumber((distanceToScreen)/(v2b.z));
-            v3b.multiplyByNumber((distanceToScreen)/(v3b.z));
-
-            v1b.x += screen.getWidth()/2.0;
-            v2b.x += screen.getWidth()/2.0;
-            v3b.x += screen.getWidth()/2.0;
-
-            v1b.y = screen.getHeight()/2.0 - v1b.y;
-            v2b.y = screen.getHeight()/2.0 - v2b.y;
-            v3b.y = screen.getHeight()/2.0 - v3b.y;
-
-            try {
-                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, new Color(90,90,9));
-                //screen.drawTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
-                screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
-                //screen.setColorAt((int) v1b.x, (int) v1b.y,Color.CYAN);
-                //screen.setColorAt((int) v2b.x, (int) v2b.y,Color.CYAN);
-                //screen.setColorAt((int) v3b.x, (int) v3b.y,Color.CYAN);
-            } catch (Exception ex) {ex.printStackTrace();}
-        }
+        tri = calcProjectedTrianglesCoordinates(tri);
+        screen.fillTriangle(tri);
     }
 
     public void render3DLine(Vec3 p1, Vec3 p2, Color c) {
-        dMatrix inverse = base;
-        inverse = inverse.multiplyByNumber(distanceToScreen);
-        inverse = inverse.getInverse();
+        calcInverse();
 
-        Vec3 v1b = p1.multiplyVec3ByMatrix(inverse);
-        Vec3 v2b = p2.multiplyVec3ByMatrix(inverse);
+        Vec3 v1b = p1.multiplyVec3ByMatrix(inverseBase);
+        Vec3 v2b = p2.multiplyVec3ByMatrix(inverseBase);
 
-        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverse);
-        //Vec3 camPos = getPos();
+        Vec3 camPos = getPos().multiplyVec3ByMatrix(inverseBase);
 
         v1b = new Vec3(v1b.x - camPos.x, v1b.y - camPos.y, v1b.z - camPos.z);
         v2b = new Vec3(v2b.x - camPos.x, v2b.y - camPos.y, v2b.z - camPos.z);
@@ -225,12 +196,6 @@ public class Camera {
             v2b.y = screen.getHeight()/2.0 - v2b.y;
 
             try {
-                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, new Color(90,90,9));
-                //screen.drawTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
-                //screen.fillTriangle((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, (int) v3b.x, (int) v3b.y, tri.c);
-                //screen.setColorAt((int) v1b.x, (int) v1b.y,Color.CYAN);
-                //screen.setColorAt((int) v2b.x, (int) v2b.y,Color.CYAN);
-                //screen.setColorAt((int) v3b.x, (int) v3b.y,Color.CYAN);
                 screen.drawLine((int) v1b.x, (int) v1b.y, (int) v2b.x, (int) v2b.y, c);
             } catch (Exception ex) {ex.printStackTrace();}
         }

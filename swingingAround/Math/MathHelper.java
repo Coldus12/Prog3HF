@@ -20,11 +20,8 @@ public class MathHelper {
             System.out.println("------------------------------------------------------------------------------------------------------------------------");
             printEx(workable);
             System.out.println("------------------------------------------------------------------------------------------------------------------------");
-            //y=10*e^(0-(x^2/4-z^2/4))
             throw new Exception("Something went wrong it seems, better fix it ya dumass");
-            //return Double.parseDouble(workable.get(0));
         }
-        //return 0;
     }
 
     //Breaking up the expression into an arraylist of smaller strings

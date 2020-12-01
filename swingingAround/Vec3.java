@@ -64,4 +64,16 @@ public class Vec3 {
     public static Vec3 vecMinusVec(Vec3 from, Vec3 what) {
         return new Vec3(from.x - what.x, from.y - what.y, from.z - what.z);
     }
+
+    public void moveXbyDelta(double delta) {
+        x += delta;
+    }
+
+    public void moveYByDelta(double delta) {
+        y += delta;
+    }
+
+    public void moveZByDelta(double delta) {
+        z += delta;
+    }
 }

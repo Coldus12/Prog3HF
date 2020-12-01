@@ -1,7 +1,5 @@
 package swingingAround;
 
-import java.awt.*;
-
 public class dMatrix {
 
     private int nrOfColumns;
@@ -42,14 +40,15 @@ public class dMatrix {
         if (mat.getHeight() != this.getWidth())
             return null;
 
-        dMatrix ret = new dMatrix(mat.getWidth(),this.getHeight());
+        dMatrix ret = new dMatrix(this.getWidth(),mat.getHeight());
 
         for (int i = 0; i < ret.getWidth(); i++) {
             for (int j = 0; j < ret.getHeight(); j++) {
                 double dRet = 0;
 
-                for (int n = 0; n < this.getWidth(); n++)
-                    dRet += this.getValueAt(j,n) * mat.getValueAt(n,i);
+                for (int n = 0; n < this.getWidth(); n++) {
+                    dRet += this.getValueAt(n,j) * mat.getValueAt(i,n);
+                }
 
                 ret.setValueAt(i,j,dRet);
             }

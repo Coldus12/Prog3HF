@@ -7,7 +7,7 @@ public class SetSizeCommand implements Command {
         if (cmd.length >= 3) {
             double size = 0;
 
-            if (!(cmd[2].equals("true") || cmd[2].equals("fasle")))
+            if (!(cmd[2].equals("true") || cmd[2].equals("false")))
                 size = Double.parseDouble(cmd[2]);
 
             if (cmd[1].equals("width"))

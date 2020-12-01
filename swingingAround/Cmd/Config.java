@@ -19,6 +19,8 @@ public class Config {
     private double stepSize = 1;
     private boolean freshlyLoadedFromFile = false;
 
+    private final int maxNumberOfEntities = 10;
+
     //private ArrayList<Mathfunction> functions;
     private ArrayList<Entity> entities;
     private ArrayList<LineEntity> lines;
@@ -41,6 +43,8 @@ public class Config {
         this.lines = conf.getLines();
         this.points = conf.getPoints();
         this.stepSize = conf.getStepSize();
+        this.camPos = conf.getCamPos();
+        this.freshlyLoadedFromFile = conf.freshlyLoadedFromFile;
     }
 
     //Getters
@@ -106,7 +110,8 @@ public class Config {
     //Others
     //------------------------------------------------------------------------------------------------------------------
     public void addEntity(Entity entity) {
-        entities.add(entity);
+        if (entities.size() < maxNumberOfEntities)
+            entities.add(entity);
     }
 
     public void removeEntity(String entityId) {
@@ -130,13 +135,6 @@ public class Config {
 
         for (int i = 0; i <  entities.size(); i++) {
             if (entities.get(i).getId().equals(entity.getId())) {
-                /*if (entity.stillExists())
-                    entities.set(i,entity);
-                else {
-                    entities.remove(i);
-                    return;
-                }*/
-
                 if (!entity.stillExists()) {
                     entities.remove(i);
                     return;
@@ -146,13 +144,17 @@ public class Config {
     }
 
     public void addLine(LineEntity line) {
-        lines.add(line);
-        entities.add(line);
+        if (entities.size() < maxNumberOfEntities) {
+            lines.add(line);
+            entities.add(line);
+        }
     }
 
     public void addPoint(PointEntity point) {
-        points.add(point);
-        entities.add(point);
+        if (entities.size() < maxNumberOfEntities) {
+            points.add(point);
+            entities.add(point);
+        }
     }
 
 }

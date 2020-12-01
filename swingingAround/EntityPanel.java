@@ -80,7 +80,6 @@ public class EntityPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            //System.out.println("Clicked fuck ye" + entity.getFormula() + " " + entity.getColor());
             entity.delete();
         }
     }
