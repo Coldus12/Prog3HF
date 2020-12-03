@@ -1,29 +1,93 @@
 package swingingAround.Cmd;
 
-import swingingAround.*;
+import swingingAround.Entities.Entity;
+import swingingAround.Entities.LineEntity;
+import swingingAround.Entities.Mathfunction;
+import swingingAround.Entities.PointEntity;
+import swingingAround.ThreeD.Vec3;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Konfigurációs osztály; minden fontosabb, változó információ itt van eltárolva.
+ * <p>
+ *     Ebben az osztályban kerül tárolásra minden a program futását befolyásoló,
+ *     változó adat.
+ *
+ *     Az ebben az osztályban tárolt információ kerül(het) mentésre, vagy esetleg
+ *     betöltésre fájlból. Ennek az osztálynak az attribútumain változtatnak a
+ *     parancsok is.
+ * </p>
+ */
 public class Config {
+    /**
+     * Azt határozza meg, hogy az entitásokat kirajzolja-e a program.
+     */
     private boolean isGraphingEnabled = true;
+    /**
+     * Ha igaz, akkor a program teli háromszögeket rajzol ki, egyébként csak a háromszög oldalai kerülnek megjelenítésre.
+     */
     private boolean graphingTrianglesFilled = false;
 
+    /**
+     * Hány háromszöget jelenít meg a program az X tengely mentén.
+     */
     private int numberOfTrianglesX = 50;
+    /**
+     * Hány háromszöget jelenít meg a program a Z tengely mentén.
+     */
     private int numberOfTrianglesZ = 50;
+    /**
+     * Hány háromszöget jelenít meg a program az Y tengely mentén.
+     */
     private int numberOfTrianglesY = 50;
 
-    private Vec3 camPos;
+    /**
+     * A kamera pozíciója a térben.
+     */
+    private Vec3 camPos = new Vec3(0,0,0);
 
+    /**
+     * Ez határozza meg, hogy a négyzetek oldalai milyen hoszzúak.
+     * (azok a négyzetek, melyek a síkokat/felületeket rajzolnak ki, és melyek háromszögekre vannak bontva.)
+     */
     private double stepSize = 1;
+    /**
+     * Fájlból nem régen lett-e betöltve a konfiguráció.
+     */
     private boolean freshlyLoadedFromFile = false;
 
+    /**
+     * Az entitások maximum száma. Elméletben lehetne több, de az a program sebességére rossz hatással lenne.
+     */
     private final int maxNumberOfEntities = 10;
 
-    //private ArrayList<Mathfunction> functions;
+    /**
+     * Entitásokból álló heterogén kollekció.
+     */
     private ArrayList<Entity> entities;
+    /**
+     * Vonalakból álló lista.
+     * <p>
+     *     Azért szükséges egy külön lista a vonalak számára, mert a sima
+     *     entitásokat a függvényeik alapján kerülnek megjelenítésre. Ezzel
+     *     szemben az egyeneseknek a térben nincs függvényük,
+     *     egyenletük/egyenletrendszerük van. És hogy ne legyen szükség típus
+     *     vizsgálatra, ezért a vonalak külön listában is szerepelnek.
+     * </p>
+     */
     private ArrayList<LineEntity> lines;
+    /**
+     * Pontokból álló lista.
+     * <p>
+     *     Azért szükséges egy külön lista a pontok számára, mert a sima
+     *     entitásokat a függvényeik alapján kerülnek megjelenítésre. Ezzel
+     *     szemben az pontoknak a térben nincs függvényük, csak koordinátájuk van.
+     *     És hogy ne legyen szükség típus vizsgálatra, ezért a pontok
+     *     külön listában is szerepelnek.
+     * </p>
+     */
     private ArrayList<PointEntity> points;
 
     public Config() {
@@ -109,17 +173,37 @@ public class Config {
 
     //Others
     //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Hozzáad egy új entitást az entitások ArrayList-jéhez.
+     * @param entity az új entitás
+     */
     public void addEntity(Entity entity) {
         if (entities.size() < maxNumberOfEntities)
             entities.add(entity);
     }
 
+    /**
+     * Egy entitás Id-ja alapján kitörli az adott entitást
+     * <p>
+     *     A törlés azért Id, és nem név alapú, mert az entitás nevét lehet változtatni,
+     *     és ezért név alapján az entitások lista tartalmát nem lehet frissíteni, hiszen ha
+     *     a név frissül, akkor nem tudjuk melyik entitás neve frissült. Ezért az entitások
+     *     rendelkeznek Id-val is, mely semmilyen körülmények között nem változhat meg.
+     * </p>
+     * @param entityId a törlendő entitás Id-ja
+     */
     public void removeEntity(String entityId) {
-        lines.removeIf(line -> (line.getName().equals(entityId)));
-        points.removeIf(point -> (point.getName().equals(entityId)));
-        entities.removeIf(n -> (n.getName().equals(entityId)));
+        lines.removeIf(line -> (line.getId().equals(entityId)));
+        points.removeIf(point -> (point.getId().equals(entityId)));
+        entities.removeIf(n -> (n.getId().equals(entityId)));
     }
 
+    /**
+     * Összegyűjti egy listába az összes tárolt entitásnak az össze függvényét
+     * egy helyre, hogy azokat közel egyszerre lehessen kirajzolni.
+     * @return az entitások függvényeiből álló lista
+     */
     public ArrayList<Mathfunction> getMathfunctions() {
         ArrayList<Mathfunction> mfs = new ArrayList<Mathfunction>();
         for (Entity entity : entities) {
@@ -129,20 +213,24 @@ public class Config {
         return mfs;
     }
 
-    public void updateEntity(Entity entity) {
+    /**
+     * Frissíti az entitásokat
+     * <p>
+     *     A frissítés azt jelenti jelen esetben, hogy törli a listákból
+     *     azokat, melyek már "nem léteznek", az az azokat, amelyeknek
+     *     az exists booleanja false.
+     * </p>
+     */
+    public void updateEntity() {
         lines.removeIf(line -> !line.stillExists());
         points.removeIf(point -> !point.stillExists());
-
-        for (int i = 0; i <  entities.size(); i++) {
-            if (entities.get(i).getId().equals(entity.getId())) {
-                if (!entity.stillExists()) {
-                    entities.remove(i);
-                    return;
-                }
-            }
-        }
+        entities.removeIf(entity -> !entity.stillExists());
     }
 
+    /**
+     * Hozzáad egy új LineEntity-t az entitások és a line-ok listáihoz.
+     * @param line az új LineEntity
+     */
     public void addLine(LineEntity line) {
         if (entities.size() < maxNumberOfEntities) {
             lines.add(line);
@@ -150,6 +238,10 @@ public class Config {
         }
     }
 
+    /**
+     * Hozzáad egy új PointEntity-t az entitások és a point-ok listáihoz.
+     * @param point az új PointEntity
+     */
     public void addPoint(PointEntity point) {
         if (entities.size() < maxNumberOfEntities) {
             points.add(point);

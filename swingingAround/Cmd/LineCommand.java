@@ -1,13 +1,29 @@
 package swingingAround.Cmd;
 
-import swingingAround.Entity;
-import swingingAround.LineEntity;
-import swingingAround.PointEntity;
-import swingingAround.Vec3;
+import swingingAround.Entities.Entity;
+import swingingAround.Entities.LineEntity;
+import swingingAround.Entities.PointEntity;
+import swingingAround.ThreeD.Vec3;
 
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Az egyenesek létrehozására képes parancs.
+ *
+ * <p>
+ *     Két féle parancsot ismer fel, az egyikhez 7 "szó" kell,
+ *     míg a másikhoz csak 3.
+ *
+ *     Az első parancs az a "line x1 y1 z1 x2 y2 z2", más szavakkal
+ *     az a helyzet amikor az egyenest úgy adjuk meg, hogy az két
+ *     ponton megy át, és nem a pontok nevét, hanem a pontok
+ *     koordinátáit adjuk át.
+ *
+ *     A második opció az a "line p1 p2", ahol p1, és p2 már létező
+ *     ezekkel a nevekkel (p1, p2) ellátott pontok.
+ * </p>
+ */
 public class LineCommand implements Command {
     @Override
     public Config execute(String[] cmd, Config conf) {

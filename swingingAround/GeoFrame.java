@@ -2,9 +2,17 @@ package swingingAround;
 
 import swingingAround.Cmd.Config;
 import swingingAround.Cmd.Console;
+import swingingAround.Entities.Entity;
+import swingingAround.Entities.LineEntity;
+import swingingAround.Entities.Mathfunction;
+import swingingAround.Entities.PointEntity;
 import swingingAround.Menu.GeoOpenFileMenu;
 import swingingAround.Menu.GeoSaveAsMenu;
 import swingingAround.Menu.GeoStandardSaveMenu;
+import swingingAround.ThreeD.Camera;
+import swingingAround.ThreeD.RotMatrices;
+import swingingAround.ThreeD.Triangle;
+import swingingAround.ThreeD.Vec3;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,21 +24,73 @@ import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * A program ablaka.
+ */
 public class GeoFrame extends JFrame {
 
+    /**
+     * Az a panel, amelyen a teret megjeleníti a program
+     */
     private final PaintPanel renderPanel;
+    /**
+     * Egy panel, melyhez hozzáadódnak az entitás panelek, és
+     * mely megjeleníti őket.
+     */
     private final JPanel configPanel;
+    /**
+     * A kamera, amelynek a szemszögéből megjelenik a tér.
+     */
     private final Camera cam;
+    /**
+     * A fenti parancssor - feladata a beírt parancsok feldolgozása,
+     * és a konfiguráció módosítása.
+     */
     private final Console cmdLine;
+    /**
+     * A konfiguráció.
+     */
     private Config conf;
+    /**
+     * Fut-e a program. Amíg ez igaz, addig ciklikusan kerülnek frissítésre,
+     * megjelenítésre a dolgok. Ha nem igaz, akkor a program kilép.
+     */
     private boolean running = true;
+    /**
+     * Entitás panelekből álló lista.
+     */
     private ArrayList<EntityPanel> entityPanels;
+    /**
+     * A program menüje.
+     */
     private final JMenuBar menuBar;
+    /**
+     * A saveAsMenu - mellyel ki lehet választani, hogy hova, milyen néven szeretnénk
+     * a fájlt elmentení.
+     */
     private final GeoSaveAsMenu saveAsMenu;
+    /**
+     * standardSaveMenu - abba a mappába ahonnan a programot indították menti el
+     * az adatokat "klon" + szám + ".ggk" néven.
+     */
     private final GeoStandardSaveMenu standardSaveMenu;
+    /**
+     * openFileMenu - ennek segítségével ki lehet választani melyik fájl tartalmát
+     * szeretnénk a konfigurációba betölteni.
+     */
     private final GeoOpenFileMenu openFileMenu;
 
 
+    /**
+     * Az ablak konstruktora. A program rögtön elindul, amint a konstruktora meghívódik.
+     * <p>
+     *     Beállítja az ablak, és a hozzá tartozó különböző panelek tulajdonságait,
+     *     beállítja az ablak layout-ját, inicializálja a kamerát, létrehozza a menüt,
+     *     és utána egy végtelen ciklusba kerül, melyben parancsot értelmez, entitásokat
+     *     rajzol entitásokat frissít, stb. egészen addig, amíg a programot be nem
+     *     zárjuk.
+     * </p>
+     */
     public GeoFrame() {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setEnabled(true);
@@ -56,7 +116,7 @@ public class GeoFrame extends JFrame {
 
         //Camera
         //--------------------------------------------------------------------------------------------------------------
-        cam = new Camera(540,360,new Vec3(0,0,0),new Vec3(0,0,1),90 * Math.PI/180.0);
+        cam = new Camera(540,360,new Vec3(0,0,0),90 * Math.PI/180.0);
         renderPanel.setScreen(cam.getScreen());
 
         //GridBagLayout stuff
@@ -132,6 +192,24 @@ public class GeoFrame extends JFrame {
         }
     }
 
+    /**
+     * Frissíti a konfigurációs panel tartalmát.
+     * <p>
+     *     A konfigurációs panel az az a panel, melyben az
+     *     entitáspanelek kerülnek megjelenítésre, melyekben
+     *     láthatóak az entitások tulajdonságai, és azok
+     *     módosíthatóak is.
+     *
+     *     Ebben a függvényben ez a panel frissül, ami annyit
+     *     tesz, hogy ha a konfigurációs fájlban szerepel olya
+     *     entitás melyhez még nem tartozik entitáspanel, akkor
+     *     ahhoz/azokhoz létrehoz entitáspanelt.
+     *
+     *     Vagy ha a konfiguráció frissen lett betöltve valami
+     *     fájlból, akkor törli az összes meglévő entitás panelt,
+     *     és újakat hoz létre az új entitásoknak.
+     * </p>
+     */
     private void updateConfigPanel() {
         ArrayList<Entity> entities = conf.getEntities();
 
@@ -157,11 +235,17 @@ public class GeoFrame extends JFrame {
         configPanel.updateUI();
     }
 
+    /**
+     * Frissíti az összes entitást, ami annyit tesz, hogy
+     * ha az entitás trölésre került, azaz az exists boolean-ja
+     * hamis, akkor anak törlődik az entitáspanele, és ő maga is
+     * törlődik a konfigurációból.
+     */
     private void updateEntities() {
+        conf.updateEntity();
         for (int i = 0; i < entityPanels.size(); i++) {
             EntityPanel current = entityPanels.get(i);
 
-            conf.updateEntity(current.getEntity());
             if (!current.hasEntity()) {
                 if (current.confChanged)
                     conf = current.getConf();
@@ -177,6 +261,9 @@ public class GeoFrame extends JFrame {
         cmdLine.setConfig(conf);
     }
 
+    /**
+     * Ha fájlból új konfigurációt töltöttek be, akkor frissíti a konfigurációt.
+     */
     private void loadingOpenedConfig() {
         conf.setCamPos(cam.getPos());
         conf = openFileMenu.getConfig(conf);
@@ -186,6 +273,20 @@ public class GeoFrame extends JFrame {
         }
     }
 
+    /**
+     * Kirajzolja az entitásokat.
+     * <p>
+     *     A függvényekhez minden tengelyhez tartozik egy for ciklus, ami meglehetősen
+     *     lassú, ezért van megszabva az, hogy egyszerre maximum csak 10 entitás jeleíthető
+     *     meg (ami így is túl sok). Ez sajnos nem egy szép megoldás, ez csak Brute Force.
+     *
+     *     A pontokat simán csak kirajzolja a program ha kitudja.
+     *
+     *     Ami az egyeneseket illeti, azok a úgy kerülnek kirajzolásra, hogy megnézzük, hogy
+     *     a kamera pozíciója milyen lambdahoz "van közel" majd a program ettől mérve -500,500
+     *     intervallumon rajzolja ki őket.
+     * </p>
+     */
     private void draw() {
         ArrayList<Mathfunction> mfs = conf.getMathfunctions();
         renderPanel.setScreen(cam.getScreen());
@@ -209,11 +310,10 @@ public class GeoFrame extends JFrame {
 
             //Lines
             //----------------------------------------------------------------------------------------------------------
-            //Kezdo lambda
             for (LineEntity line: lines) {
                 double lambda = (cam.getPos().x) / line.getDirection().x - (conf.getNumberOfTrianglesX());
 
-                for (int i = (int) lambda; i < (int) (lambda + (conf.getNumberOfTrianglesX())); i++) {
+                for (int i = (int) lambda - 500; i < (int) lambda + 500; i++) {
                     Vec3 p1 = line.calcPartOfLine(i);
                     Vec3 p2 = line.calcPartOfLine(i+1);
 
@@ -222,7 +322,7 @@ public class GeoFrame extends JFrame {
             }
 
             //X
-            //--------------------------------------------------------------------------------------------------
+            //----------------------------------------------------------------------------------------------------------
             float currentX = (float) (cam.getPos().x - xInLoop);
             float currentY = (float) (cam.getPos().y - yInLoop);
             float currentZ = (float) (cam.getPos().z - zInLoop);
@@ -240,12 +340,17 @@ public class GeoFrame extends JFrame {
                             double x3 = mf.exec3DFunction(0, currentY + stepSize, currentZ + stepSize);
                             double x4 = mf.exec3DFunction(0, currentY, currentZ + stepSize);
 
+                            Vec3 v1 = new Vec3(x1,currentY,currentZ);
+                            Vec3 v2 = new Vec3(x2,currentY+stepSize,currentZ);
+                            Vec3 v3 = new Vec3(x3,currentY+stepSize,currentZ+stepSize);
+                            Vec3 v4 = new Vec3(x4,currentY,currentZ+stepSize);
+
                             if (conf.getGraphingTrianglesFilled()) {
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x2,currentY+stepSize,currentZ),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x4,currentY,currentZ+stepSize),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(v1,v2,v3,mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(v1,v4,v3,mf.getColor()));
                             } else {
-                                cam.render3DTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x2,currentY+stepSize,currentZ),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
-                                cam.render3DTriangle(new Triangle(new Vec3(x1,currentY,currentZ),new Vec3(x4,currentY,currentZ+stepSize),new Vec3(x3,currentY+stepSize,currentZ+stepSize),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(v1,v2,v3,mf.getColor()));
+                                cam.render3DTriangle(new Triangle(v1,v4,v3,mf.getColor()));
                             }
                         }
 
@@ -255,7 +360,7 @@ public class GeoFrame extends JFrame {
             }
 
             //Y
-            //--------------------------------------------------------------------------------------------------
+            //----------------------------------------------------------------------------------------------------------
             currentX = (float) (cam.getPos().x - xInLoop);
             currentY = (float) (cam.getPos().y - yInLoop);
             currentZ = (float) (cam.getPos().z - zInLoop);
@@ -273,12 +378,17 @@ public class GeoFrame extends JFrame {
                             double y3 = mf.exec3DFunction(currentX + stepSize,0,currentZ + stepSize);
                             double y4 = mf.exec3DFunction(currentX,0,currentZ + stepSize);
 
+                            Vec3 v1 = new Vec3(currentX,y1,currentZ);
+                            Vec3 v2 = new Vec3(currentX+stepSize,y2,currentZ);
+                            Vec3 v3 = new Vec3(currentX+stepSize,y3,currentZ+stepSize);
+                            Vec3 v4 = new Vec3(currentX,y4,currentZ+stepSize);
+
                             if (conf.getGraphingTrianglesFilled()) {
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX+stepSize,y2,currentZ),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX,y4,currentZ+stepSize),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(v1,v2,v3,mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(v1,v4,v3,mf.getColor()));
                             } else {
-                                cam.render3DTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX+stepSize,y2,currentZ),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
-                                cam.render3DTriangle(new Triangle(new Vec3(currentX,y1,currentZ),new Vec3(currentX,y4,currentZ+stepSize),new Vec3(currentX+stepSize,y3,currentZ+stepSize),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(v1,v2,v3,mf.getColor()));
+                                cam.render3DTriangle(new Triangle(v1,v4,v3,mf.getColor()));
                             }
                         }
 
@@ -288,7 +398,7 @@ public class GeoFrame extends JFrame {
             }
 
             //Z
-            //--------------------------------------------------------------------------------------------------
+            //----------------------------------------------------------------------------------------------------------
             currentX = (float) (cam.getPos().x - xInLoop);
             currentY = (float) (cam.getPos().y - yInLoop);
             currentZ = (float) (cam.getPos().z - zInLoop);
@@ -306,12 +416,17 @@ public class GeoFrame extends JFrame {
                             double z3 = mf.exec3DFunction(currentX + stepSize,currentY + stepSize,0);
                             double z4 = mf.exec3DFunction(currentX,currentY + stepSize,0);
 
+                            Vec3 v1 = new Vec3(currentX,currentY,z1);
+                            Vec3 v2 = new Vec3(currentX+stepSize,currentY,z2);
+                            Vec3 v3 = new Vec3(currentX+stepSize,currentY+stepSize,z3);
+                            Vec3 v4 = new Vec3(currentX,currentY+stepSize,z4);
+
                             if (conf.getGraphingTrianglesFilled()) {
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX+stepSize,currentY,z2),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
-                                cam.render3DFilledTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX,currentY+stepSize,z4),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(v1,v2,v3,mf.getColor()));
+                                cam.render3DFilledTriangle(new Triangle(v1,v4,v3,mf.getColor()));
                             } else {
-                                cam.render3DTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX+stepSize,currentY,z2),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
-                                cam.render3DTriangle(new Triangle(new Vec3(currentX,currentY,z1),new Vec3(currentX,currentY+stepSize,z4),new Vec3(currentX+stepSize,currentY+stepSize,z3),mf.getColor()));
+                                cam.render3DTriangle(new Triangle(v1,v2,v3,mf.getColor()));
+                                cam.render3DTriangle(new Triangle(v1,v4,v3,mf.getColor()));
                             }
                         }
 
@@ -327,6 +442,16 @@ public class GeoFrame extends JFrame {
         cmdLine.setConfig(conf);
     }
 
+    /**
+     * Az ablakra való kattintásra figyelő MouseListener.
+     * <p>
+     *     Erre azért van szükség, mert egy JTextField elveszi
+     *     a fókuszt az ablaktól, így az nem képes a leütött
+     *     billentyűkre reagálni. Így ha rákattintunk az ablakra,
+     *     azzal visszaadjuk neki a fókuszt, és tud reagálni a
+     *     billenytű leütésekre.
+     * </p>
+     */
     private class ClickListener implements MouseListener {
 
         @Override
@@ -355,6 +480,27 @@ public class GeoFrame extends JFrame {
         }
     }
 
+    /**
+     * Billentyű leütéseket figyeli - leginkább a kamera irányítása miatt.
+     * <p>
+     *     Az Escape lenyomása után a program kilép.
+     *     W-vel a kamera egyet megy előre a z tengely mentén.
+     *     S-vel a kamera egyet megy hátra a z tengely mentén.
+     *     A-vel a kamera egyet megy balra az x tengely mentén.
+     *     D-vel a kamera egyet megy jobbra az x tengely mentén.
+     *     U-val a kamera egyet megy felfelé az y tengely mentén.
+     *     J-vel a kamera egyet megy lefelé az y tengely mentén.
+     *
+     *     Q-val az y tengely körül fordul a kamera egy fokkal
+     *     E-vel az y tengely körül fordul a kamera minusz egy fokkal
+     *
+     *     F-val az x tengely körül fordul a kamera egy fokkal
+     *     R-vel az x tengely körül fordul a kamera minusz egy fokkal
+     *
+     *     Y-al a z tengely körül fordul a kamera egy fokkal
+     *     X-el a z tengely körül fordul a kamera minusz egy fokkal
+     * </p>
+     */
     private class GeoListener implements KeyListener {
 
         @Override
@@ -428,10 +574,17 @@ public class GeoFrame extends JFrame {
         }
     }
 
+    /**
+     * Átadja a fókuszt az ablaknak.
+     */
     private void focusRequest() {
         this.requestFocus();
     }
 
+    /**
+     * Visszaadja ezt az ablakot.
+     * @return Ez az ablak.
+     */
     private JFrame getFrame() {
         return this;
     }

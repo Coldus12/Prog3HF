@@ -1,16 +1,50 @@
-package swingingAround;
+package swingingAround.Entities;
 
 import swingingAround.Math.MathHelper;
 
 import java.awt.*;
 
+/**
+ * Egyszerű térbeli függvényekhez tartozó entitás.
+ */
 public class FunctionEntity extends Entity {
 
+    /**
+     * Hány darab függvény entitás volt amióta a program elindult
+     * <p>
+     *     Az egyetlen szerepe ennek a változónak az,
+     *     hogy biztosítsa azt, hogy minden függvény
+     *     entitás különböző, egyedi id-val rendelkezik.
+     * </p>
+     */
     private static int number;
 
+    /**
+     * Maga a függvény.
+     */
     private Mathfunction mf;
+    /**
+     * A szín amivel kirajzolódik majd a függvény.
+     */
     private Color color;
 
+    /**
+     * Az osztály konstruktora, mely egy String tömb alapján
+     * létrehozza a megfelelő Mathfunction-t.
+     * <p>
+     *     A konstruktor beállítja az entitás id-ját, nevét,
+     *     színét, majd létrehozza a hozzá tartozó Mathfunction-t.
+     *
+     *     A Mathfunction megfelelő működéséhez a MathHelper függvényeit
+     *     használja. Jelen esetben a(z) exec3DFunction először is majd
+     *     összerakja egy Stringbe mindazt, ami az egyenlőség után állt.
+     *     Ezek után ebben a Stringben kicserél minden x,y,z-t a megfelelő
+     *     értékre, majd az így kapott Stringet átadja a MathHelpernek,
+     *     ami megpróbálja végrehajtani, és ha sikerül, akkor egy double-el
+     *     tér vissza.
+     * </p>
+     * @param function a függvény hozzárendelési szabálya földarabolva.
+     */
     public FunctionEntity(String[] function) {
         number++;
         setName("function" + number);
@@ -81,6 +115,10 @@ public class FunctionEntity extends Entity {
         setFormula(formula);
     }
 
+    /**
+     * Visszadja az entitáshoz tartozó Mathfunction-t.
+     * @return a függvény Mathfunction-je.
+     */
     @Override
     public Mathfunction[] getMathfunctions() {
         Mathfunction[] mfs = new Mathfunction[1];

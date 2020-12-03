@@ -1,25 +1,29 @@
 package swingingAround.Menu;
 
 import swingingAround.Cmd.Config;
-import swingingAround.Entity;
-import swingingAround.Vec3;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 
+/**
+ * .ggk fájl mentésére szolgáló menü osztály, ha szeretnénk
+ * kiválasztani hova, és milyen néven legyen mentve a fájl.
+ */
 public class GeoSaveAsMenu extends JMenuItem {
-
-    JFileChooser chooser;
-    File chosenFile;
-    Config currentConf;
+    /**
+     * Az ablak amiből ki lehet választani hova szeretnénk menteni a fájlt, és milyen néven.
+     */
+    private JFileChooser chooser;
+    /**
+     * A fájl amibe menteni szeretnénk.
+     */
+    private File chosenFile;
+    /**
+     * A konfiguráció aminek tartalmát menteni szeretnénk.
+     */
+    private Config currentConf;
 
     public GeoSaveAsMenu(Config conf) {
         this.setText("Save as");
@@ -29,8 +33,21 @@ public class GeoSaveAsMenu extends JMenuItem {
         this.addActionListener(new SaveListener());
     }
 
+    /**
+     * Ezzel lehet frissíteni a mentendő konfigurációt.
+     * @param newerConf az újabb mentendő konfiguráció
+     */
     public void updateConf(Config newerConf) {currentConf = newerConf;}
 
+    /**
+     * A menü megnyomását figyelő privát osztály
+     * <p>
+     *     Ha megnyomták a menü gombot, akkor megnyit egy új
+     *     fájl kiválasztó ablakot, ahonnan ki lehet választani,
+     *     hogy hova szeretnénk menteni a konfiguráció, és milyen
+     *     néven.
+     * </p>
+     */
     private class SaveListener implements ActionListener {
 
         @Override
@@ -42,7 +59,7 @@ public class GeoSaveAsMenu extends JMenuItem {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 chosenFile = chooser.getSelectedFile();
 
-                SaveGGK save = new SaveGGK(chosenFile, currentConf);
+                SaveGGK.saveConfigToFile(chosenFile,currentConf);
             }
         }
     }

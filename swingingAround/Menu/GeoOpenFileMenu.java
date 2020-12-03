@@ -2,22 +2,33 @@ package swingingAround.Menu;
 
 import swingingAround.Cmd.Config;
 import swingingAround.Cmd.Console;
-import swingingAround.Entity;
-import swingingAround.Vec3;
+import swingingAround.Entities.Entity;
+import swingingAround.ThreeD.Vec3;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * .ggk fájl megnyitására szolgáló menü osztály.
+ */
 public class GeoOpenFileMenu extends JMenuItem {
 
-    JFileChooser chooser;
-    File chosenFile;
-    Config currentConf;
-    boolean openedAFile = false;
+    /**
+     * Az ablak amiből ki lehet választani melyik fájlt szeretnénk megnyitni.
+     */
+    private JFileChooser chooser;
+    /**
+     * A kiválasztott, megnyitandó fájl.
+     */
+    private File chosenFile;
+    /**
+     * A konfigurációs osztály, amibe bele olvassuk a fájlból az adatokat.
+     */
+    private Config currentConf;
+    private boolean openedAFile = false;
 
     public GeoOpenFileMenu() {
         this.setText("Open");
@@ -26,6 +37,11 @@ public class GeoOpenFileMenu extends JMenuItem {
         this.addActionListener(new Openlistener());
     }
 
+    /**
+     * Visszaadja az új konfigurációs osztályt, ha lett fájl megnyitva, egyébként azt adja vissza, amit kapott.
+     * @param conf konfigurációs osztály amit visszaad, ha nem nyitottak meg fájlt.
+     * @return a frissen betöltött konfigurációs osztály, vagy az amit kapott.
+     */
     public Config getConfig(Config conf) {
         if (openedAFile) {
 
@@ -40,6 +56,18 @@ public class GeoOpenFileMenu extends JMenuItem {
             return conf;
     }
 
+    /**
+     * A menü megnyomását figyelő privát osztály
+     * <p>
+     *     Ha megnyomták a menü gombot, akkor megnyit egy új
+     *     fájl kiválasztó ablakot, ahonnan ki lehet választani
+     *     a megnyitandó fájlt. Ugyanakkor ebben az ablakban csak
+     *     mappák, és ".ggk"-ra végződő fájlok jelennek meg.
+     *
+     *     Ha sikerült az ablakban fájlt választani, akkor
+     *     annak a tartalmát beolvassa egy konfigurációs osztályba.
+     * </p>
+     */
     private class Openlistener implements ActionListener {
 
         @Override
@@ -58,6 +86,11 @@ public class GeoOpenFileMenu extends JMenuItem {
         }
     }
 
+    /**
+     * Beolvassa egy megnyitott fájl tartalmát egy új konfigurációs osztályba.
+     * @param openedFile a megnyitásra kiválasztott fájl
+     * @return egy új a fájlban szereplő adatokkal feltöltött konfigurációs osztály.
+     */
     public static Config openGgkFile(File openedFile) {
         String line = "";
         Config conf = null;
@@ -99,7 +132,11 @@ public class GeoOpenFileMenu extends JMenuItem {
             }
         } catch (IOException ex) {
             System.err.println("Something went wrong while opening file: " + openedFile.getName() + "\nPath: " + openedFile.getPath());
+            System.err.println("Returning new, empty config.");
             ex.printStackTrace();
+            conf = new Config();
+            conf.setFreshlyLoadedFromFile(true);
+            return conf;
         }
 
         return conf;

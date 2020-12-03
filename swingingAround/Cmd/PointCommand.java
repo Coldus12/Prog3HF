@@ -1,10 +1,13 @@
 package swingingAround.Cmd;
 
-import swingingAround.PointEntity;
-import swingingAround.Vec3;
+import swingingAround.Entities.PointEntity;
+import swingingAround.ThreeD.Vec3;
 
 import java.awt.*;
 
+/**
+ * Pontok létrehozására képes parancs.
+ */
 public class PointCommand implements Command {
     @Override
     public Config execute(String[] cmd, Config conf) {

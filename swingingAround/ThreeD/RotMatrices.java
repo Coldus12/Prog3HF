@@ -1,9 +1,17 @@
-package swingingAround;
+package swingingAround.ThreeD;
 
+/**
+ * Térbeli forgás mátrixok
+ */
 public class RotMatrices {
 
     private static double degree = Math.PI/180;
 
+    /**
+     * Visszaadja azt a mátrixot amivel az x tengely mentén lehet forgatni "degrees" fokkal.
+     * @param degrees hány fokkal legyen elforgatva az x tengely mentén
+     * @return az a forgató mátrix, ami "degrees" fokkal forgat az x tengely körül a vele való szorzás folytamán
+     */
     public static dMatrix rotateXByDegree(double degrees) {
         dMatrix rotX = new dMatrix(3,3);
 
@@ -22,6 +30,11 @@ public class RotMatrices {
         return rotX;
     }
 
+    /**
+     * Visszaadja azt a mátrixot amivel az y tengely mentén lehet forgatni "degrees" fokkal.
+     * @param degrees hány fokkal legyen elforgatva az y tengely mentén
+     * @return az a forgató mátrix, ami "degrees" fokkal forgat az y tengely körül a vele való szorzás folytamán
+     */
     public static dMatrix rotateYByDegree(double degrees) {
         dMatrix rotY = new dMatrix(3,3);
 
@@ -40,6 +53,11 @@ public class RotMatrices {
         return rotY;
     }
 
+    /**
+     * Visszaadja azt a mátrixot amivel az z tengely mentén lehet forgatni "degrees" fokkal.
+     * @param degrees hány fokkal legyen elforgatva az z tengely mentén
+     * @return az a forgató mátrix, ami "degrees" fokkal forgat az z tengely körül a vele való szorzás folytamán
+     */
     public static dMatrix rotateZByDegree(double degrees) {
         dMatrix rotZ = new dMatrix(3,3);
 

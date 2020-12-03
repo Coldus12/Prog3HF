@@ -1,8 +1,12 @@
 package swingingAround.Menu;
 
 import java.io.File;
-import java.io.FileFilter;
 
+/**
+ * FileFilter ami arra szolgál, hogy a fájl mentő/nyitó
+ * dialogus ablakban megjelnő fájlokat szűrje úgy, hogy
+ * csak .ggk és mappák jelenjenek meg bennük.
+ */
 public class GgkFilter extends javax.swing.filechooser.FileFilter {
     @Override
     public boolean accept(File file) {

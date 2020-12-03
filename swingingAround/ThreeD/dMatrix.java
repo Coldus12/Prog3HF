@@ -1,12 +1,29 @@
-package swingingAround;
+package swingingAround.ThreeD;
 
+/**
+ * Valós szám (double) mátrix.
+ */
 public class dMatrix {
 
+    /**
+     * Hány oszlopa van a mátrixnak
+     */
     private int nrOfColumns;
+    /**
+     * Hány sora van a mátrixnak
+     */
     private int nrOfRows;
 
+    /**
+     * Valós szám tömb, ami maga a mátrix valójában.
+     */
     private double matrix[];
 
+    /**
+     * A mátrix konstruktora, mely létrehoz egy nxm-es mátrixot.
+     * @param columns mátrix oszlopainak száma
+     * @param rows mátrix sorainak száma
+     */
     public dMatrix(int columns, int rows) {
         nrOfColumns = columns;
         nrOfRows = rows;
@@ -20,22 +37,49 @@ public class dMatrix {
         }
     }
 
+    /**
+     * Visszaad egy értéket a mátrix egy adott helyéről
+     * @param x melyik oszlop
+     * @param y melyik sor
+     * @return az érték az adott sor és oszlop metszetében.
+     */
     public double getValueAt(int x, int y) {
-        return matrix[x * nrOfRows + y];
+        if (x * nrOfRows + y < matrix.length)
+            return matrix[x * nrOfRows + y];
+        return 0;
     }
 
+    /**
+     * Beállít egy értéket a mátrix egy adott sorának és oszlopának metszetében.
+     * @param x melyik oszlop
+     * @param y melyik sor
+     * @param newValue az új érték
+     */
     public void setValueAt(int x, int y, double newValue) {
         matrix[x * nrOfRows + y] = newValue;
     }
 
+    /**
+     * Milyen széles a mátrix, azaz hány oszlopa van.
+     * @return mátrix oszlopainak száma.
+     */
     public int getWidth() {
         return nrOfColumns;
     }
 
+    /**
+     * Milyen magas a mátrix, azaz hány sora van.
+     * @return mátrix sorainak száma.
+     */
     public int getHeight() {
         return nrOfRows;
     }
 
+    /**
+     * Beszorozza ezt a mátrixot egy másik mátrixxal.
+     * @param mat a másik mátrix, amivel ez be van szorozva
+     * @return a szorzás eredeménye
+     */
     public dMatrix multiplyByMatrix(dMatrix mat) {
         if (mat.getHeight() != this.getWidth())
             return null;
@@ -57,6 +101,11 @@ public class dMatrix {
         return ret;
     }
 
+    /**
+     * Létrehoz egy új mátrixot, melynek elemei ennek a mátrixnak az elemei beszorozva egy adott számmal.
+     * @param nr a szám
+     * @return az új mátrix
+     */
     public dMatrix multiplyByNumber(double nr) {
         dMatrix ret = new dMatrix(this.getWidth(),this.getHeight());
 
@@ -69,19 +118,26 @@ public class dMatrix {
         return ret;
     }
 
+    /**
+     * Visszaadja a mátrix determinánsát, feltéve hogy a mátrix 3x3-as.
+     * @return mátrix determinánsa
+     */
     private double determinantThreeByThree() {
         double det = 0;
 
-        det += getValueAt(0,0) * (getValueAt(1,1) * getValueAt(2,2) - getValueAt(1,2) * getValueAt(2,1));
-        det -= getValueAt(1,0) * (getValueAt(0,1) * getValueAt(2,2) - getValueAt(2,1) * getValueAt(0,2));
-        det += getValueAt(2,0) * (getValueAt(0,1) * getValueAt(1,2) - getValueAt(1,1) * getValueAt(0,2));
+        if ((getHeight() == 3) && (getWidth() == 3)) {
+            det += getValueAt(0, 0) * (getValueAt(1, 1) * getValueAt(2, 2) - getValueAt(1, 2) * getValueAt(2, 1));
+            det -= getValueAt(1, 0) * (getValueAt(0, 1) * getValueAt(2, 2) - getValueAt(2, 1) * getValueAt(0, 2));
+            det += getValueAt(2, 0) * (getValueAt(0, 1) * getValueAt(1, 2) - getValueAt(1, 1) * getValueAt(0, 2));
+        }
 
         return det;
     }
 
-    //Making an inverse matrix for a 3x3 matrix
-    //This function is using the adjoint matrix method
-    //to calculate the inverse of this matrix.
+    /**
+     * Ha a mátrix 3x3-as, akkor elkészíti hozzá az inverzét.
+     * @return a mátrix inverze.
+     */
     public dMatrix getInverse() {
         dMatrix ret = null;
 
@@ -130,6 +186,9 @@ public class dMatrix {
         return ret;
     }
 
+    /**
+     * Kiírja a mátrixot.
+     */
     public void printMatrix() {
         System.out.println("printing out the matrix");
         for (int i = 0; i < getWidth(); i++) {

@@ -1,8 +1,8 @@
 package swingingAround.Menu;
 
 import swingingAround.Cmd.Config;
-import swingingAround.Entity;
-import swingingAround.Vec3;
+import swingingAround.Entities.Entity;
+import swingingAround.ThreeD.Vec3;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,10 +10,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * A konfigurációt menteni képes osztály.
+ */
 public class SaveGGK {
 
-    public SaveGGK(File saveFile, Config conf) {
+    /**
+     * Adott konfigurációt adott fájlba írja ki.
+     * @param saveFile a fájl amibe a konfiguráció mentendő
+     * @param conf az osztály aminek az adatai mentésre kerülnek.
+     */
+    public static void saveConfigToFile(File saveFile, Config conf) {
         try {
+            if (!saveFile.getName().endsWith(".gkk"))
+                saveFile = new File(saveFile.getPath()+".ggk");
+
             ArrayList<Entity> entities = conf.getEntities();
             FileWriter fw = new FileWriter(saveFile);
             BufferedWriter bf = new BufferedWriter(fw);

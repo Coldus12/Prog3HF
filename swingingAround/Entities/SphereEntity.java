@@ -1,15 +1,58 @@
-package swingingAround;
+package swingingAround.Entities;
+
+import swingingAround.ThreeD.Vec3;
 
 import java.awt.*;
 
+/**
+ * Gömbhöz tartozó entitás
+ */
 public class SphereEntity extends Entity {
+    /**
+     * Hány darab gömb lett létrehozva amióta a program elindult
+     * <p>
+     *     Az egyetlen szerepe ennek a változónak az,
+     *     hogy biztosítsa azt, hogy minden gömb
+     *     rendelkezik egy különböző, egyedi id-val.
+     * </p>
+     */
     private static int number;
 
+    /**
+     * A gömb színe.
+     */
     private Color color;
+    /**
+     * A gömbhöz tartozó függvények
+     * <p>
+     *     Egy gömbhöz valójában elég lenne két függvény is,
+     *     lásd: y=-(25-x^2-z^2)^(1/2) és y=(25-x^2-z^2)^(1/2).
+     *     Ezzel szemben itt négy függvény van, pusztán azért hogy
+     *     esetleg szebben jelenjen meg. Kettő a gömböt y-ra fejezi ki,
+     *     míg másik kettő z-re.
+     * </p>
+     */
     private final Mathfunction mf1,mf2, mf3, mf4;
+    /**
+     * A gömb középpontja.
+     */
     private Vec3 center;
+    /**
+     * A gömb sugara.
+     */
     private float radius;
 
+    /**
+     * A gömb konstruktora.
+     * <p>
+     *     Létrehozza a középponthoz és sugárhoz tartozó
+     *     négy függvényt, beállítja az entitás id-ját,
+     *     nevét, színét, képletét.
+     * </p>
+     * @param center gömb középpontja
+     * @param radius gömb sugara
+     * @param c gömb színe
+     */
     public SphereEntity(Vec3 center, float radius, Color c) {
         this.center = center;
         this.radius = radius;
@@ -22,7 +65,6 @@ public class SphereEntity extends Entity {
         mf1 = new Mathfunction() {
             @Override
             public float exec3DFunction(float x, float y, float z) {
-                //setCurrentAxis(Axis.y);
                 float Xsquared = (float) Math.pow(x - center.x,2);
                 float Zsquared = (float) Math.pow(z - center.z,2);
 
@@ -34,7 +76,6 @@ public class SphereEntity extends Entity {
         mf2 = new Mathfunction() {
             @Override
             public float exec3DFunction(float x, float y, float z) {
-                //setCurrentAxis(Axis.y);
                 float Xsquared = (float) Math.pow(x - center.x,2);
                 float Zsquared = (float) Math.pow(z - center.z,2);
 
@@ -46,7 +87,6 @@ public class SphereEntity extends Entity {
         mf3 = new Mathfunction() {
             @Override
             public float exec3DFunction(float x, float y, float z) {
-                //setCurrentAxis(Axis.y);
                 float Xsquared = (float) Math.pow(x - center.x,2);
                 float Ysquared = (float) Math.pow(y - center.y,2);
 
@@ -58,7 +98,6 @@ public class SphereEntity extends Entity {
         mf4 = new Mathfunction() {
             @Override
             public float exec3DFunction(float x, float y, float z) {
-                //setCurrentAxis(Axis.y);
                 float Xsquared = (float) Math.pow(x - center.x,2);
                 float Ysquared = (float) Math.pow(y - center.y,2);
 

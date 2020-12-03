@@ -1,6 +1,20 @@
 package swingingAround.Cmd;
 
-public class SetSizeCommand implements Command {
+/**
+ * A konfigurációs osztály változóinak értékét lehet ezekkel a parancsokkal megváltoztatni.
+ * <p>
+ *     A "set width/height/length x" parancs beállítja, hogy egy adott tengely mentén
+ *     hány háromszöget rajzoljon ki a program. A "height" az y tengely, a "width" az x tengely,
+ *     míg a "length" a z tengely mentén állítja ezt be.
+ *
+ *     A "set stepSize x" parancs azt változtatja meg, hogy a tengelyek mentén mekkora
+ *     egységenként legyen új háromszög kirajzolva.
+ *
+ *     A "set filled true/false" parancstól függ, hogy a program teli háromszögeket rajzol ki,
+ *     vagy csak az oldalait rajzolja ki a háromszögeknek.
+ * </p>
+ */
+public class SetCommand implements Command {
     @Override
     public Config execute(String[] cmd, Config conf) {
 

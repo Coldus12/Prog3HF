@@ -2,6 +2,7 @@ package swingingAround;
 
 import swingingAround.Cmd.Config;
 import swingingAround.Cmd.Console;
+import swingingAround.Entities.Entity;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,17 +12,67 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
+/**
+ * Entitások információinak megjelenítésére és módosítására fenntartott módosított JPanel
+ */
 public class EntityPanel extends JPanel {
 
-    JComboBox<String> colorBox;
-    JButton deleteButton;
-    Entity entity;
-    JTextField formula;
-    Color color = Color.GREEN;
+    /**
+     * Színválasztásra szolgáló JComboBox
+     * <p>
+     *     13 különböző szín neve közül lehet választani.
+     *     A kulcsszó a név. Ez egy String-et váltogat,
+     *     és van egy ActionListener-je, ami az action
+     *     hatására egy switch segítségével megváltoztatja
+     *     az adott entitás színét.
+     * </p>
+     */
+    private JComboBox<String> colorBox;
+    /**
+     * Az entitás törlésére szolgáló gomb
+     */
+    private JButton deleteButton;
+    /**
+     * Az entitás aminek az információi megjelenítendők, és módosíthatók.
+     */
+    private Entity entity;
+    /**
+     * Az entitás képlete/függvénye/parancsa, ami módosítható, melynek hatására akár az egész entitás lecserélődhet.
+     */
+    private JTextField formula;
+    /**
+     * Az entitás színe
+     */
+    private Color color = Color.GREEN;
 
-    Config currentConf;
+    /**
+     * Egy konfiguráció, ami folyamatosan frissül.
+     * <p>
+     *     Erre csak azért van szükség, mert ha ennek a
+     *     formula nevezetű JTextField-jén érkezik parancs,
+     *     ami megváltoztat valamit a konfiguráción, akkor azt
+     *     valahogy jelezni kell. Ez úgy történik, hogy a
+     *     confChanged boolean true-ra változik, és ekkor
+     *     ennek az osztálynak a getConfig-je a legfrissebb
+     *     konfigurációt adja vissza, amiben már a módosítás
+     *     is szerepel.
+     * </p>
+     */
+    private Config currentConf;
+    /**
+     * Ha ez igaz, akkor ennek az osztálynak a legfrissebb konfigurációja kerül használatba.
+     */
     boolean confChanged = false;
 
+    /**
+     * EntityPanel konstruktora.
+     * <p>
+     *     Létrehozza a szükséges GUI elemeket, és beállítja azok
+     *     tulajdonságait.
+     * </p>
+     * @param entity a megejelenítendő és módosíthatü entitás
+     * @param conf a jelenlegi konfiguráció
+     */
     public EntityPanel(Entity entity, Config conf) {
         String[] colors = {"Cyan","Blue","Magenta","Pink","Red","Orange","Yellow","Green","White","Lightgray","Gray","Darkgray","Black"};
         colorBox = new JComboBox<String>(colors);
@@ -37,7 +88,7 @@ public class EntityPanel extends JPanel {
         formula = new JTextField();
         formula.setSize(100,20);
         formula.setPreferredSize(new Dimension(100,20));
-        formula.setText(entity.getFormula());
+        formula.setText(entity.getFormula() + " : " + entity.getName());
         Font font = formula.getFont();
         font = font.deriveFont((float) 14);
         formula.setFont(font);
@@ -54,6 +105,10 @@ public class EntityPanel extends JPanel {
         currentConf = conf;
     }
 
+    /**
+     * A formula JTextField-ben lévő parancs/formula alapján frissíti a panel
+     * saját entitását, és a konfigurációt is.
+     */
     public void updateEntityByFormula() {
         confChanged = true;
 
@@ -63,6 +118,10 @@ public class EntityPanel extends JPanel {
         entity.setColor(color);
     }
 
+    /**
+     * Beállít egy új konfigurációt
+     * @param conf az új konfiguráció
+     */
     public void setConfig(Config conf) {
         currentConf = conf;
     }
@@ -76,6 +135,9 @@ public class EntityPanel extends JPanel {
         return entity;
     }
 
+    /**
+     * A törlés gombot figyelő ActionListener. Ha a gombot megnyomják, akkor az entitás törlésre kerül.
+     */
     private class ButtonListener implements ActionListener {
 
         @Override
@@ -88,6 +150,11 @@ public class EntityPanel extends JPanel {
         return entity.stillExists();
     }
 
+    /**
+     * Egy actionListener, ami a JComboBox megváltozására
+     * az éppen kiválasztott String alapján megváltoztatja
+     * az entitás színét.
+     */
     private class ColorListener implements ActionListener {
 
         @Override
@@ -141,6 +208,14 @@ public class EntityPanel extends JPanel {
         }
     }
 
+    /**
+     * KeyListener, ami azt figyeli, hogy nyomtak-e entert a formula-t
+     * kiíró, és értelmező JTextField-en.
+     * <p>
+     *     Ha enter-t nyomtak, akkor a formulát, ami a JTextField-ben
+     *     szerepel megpróbálja parancsként feldolgozni.
+     * </p>
+     */
     private class FormulaListener implements KeyListener {
 
         @Override
