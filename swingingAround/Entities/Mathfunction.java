@@ -1,11 +1,21 @@
 package swingingAround.Entities;
 
+import swingingAround.ThreeD.Triangle;
+import swingingAround.ThreeD.Vec3;
+import swingingAround.ThreeD.dMatrix;
+
 import java.awt.*;
 
 /**
  * A térbeli függvény reprezentációja.
  */
 public abstract class Mathfunction {
+    private dMatrix mat;
+
+    public Mathfunction(Axis axis) {
+        currentAxis = axis;
+    }
+
     /**
      * A függvény színe.
      */
@@ -44,4 +54,78 @@ public abstract class Mathfunction {
      * @return a függvény értéke az adott pontban.
      */
     public abstract float exec3DFunction(float x, float y, float z);
+
+    public void calcMat(Vec3 middle, int width, int height, double stepSize) {
+        width += 1;
+        height += 1;
+        mat = new dMatrix(width,height);
+
+        double xInLoop = 0;
+        double yInLoop = 0;
+        double zInLoop = 0;
+
+        float currentX = 0;
+        float currentY = 0;
+        float currentZ = 0;
+
+        switch (getCurrentAxis()) {
+            case x:
+                yInLoop = width/2.0 * stepSize;
+                zInLoop = height/2.0 * stepSize;
+
+                currentY = (float) (middle.y - yInLoop);
+                currentZ = (float) (middle.z - zInLoop);
+
+                for (int i = 0; i < width; i++) {
+                    currentY += stepSize;
+                    for (int j = 0; j < height; j++) {
+                        currentZ += stepSize;
+
+                        mat.setValueAt(i,j,exec3DFunction(0, currentY, currentZ));
+                    }
+                    currentZ = (float) (middle.z - zInLoop);
+                }
+                break;
+            case y:
+                xInLoop = width/2.0 * stepSize;
+                zInLoop = height/2.0 * stepSize;
+
+                currentX = (float) (middle.x - xInLoop);
+                currentZ = (float) (middle.z - zInLoop);
+
+                for (int i = 0; i < width; i++) {
+                    currentX += stepSize;
+                    for (int j = 0; j < height; j++) {
+                        currentZ += stepSize;
+
+                        mat.setValueAt(i,j,exec3DFunction(currentX, 0, currentZ));
+                    }
+                    currentZ = (float) (middle.z - zInLoop);
+                }
+                break;
+            case z:
+                xInLoop = width/2.0 * stepSize;
+                yInLoop = height/2.0 * stepSize;
+
+                currentX = (float) (middle.x - xInLoop);
+                currentY = (float) (middle.y - yInLoop);
+
+                for (int i = 0; i < width; i++) {
+                    currentX += stepSize;
+                    for (int j = 0; j < height; j++) {
+                        currentY += stepSize;
+
+                        mat.setValueAt(i,j,exec3DFunction(currentX, currentY, 0));
+                    }
+                    currentY = (float) (middle.y - yInLoop);
+                }
+                break;
+        }
+    }
+
+    public double getMatValueAt(int x, int y) {
+        return mat.getValueAt(x,y);
+    }
+
+
 }

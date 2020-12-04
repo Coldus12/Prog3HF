@@ -52,7 +52,7 @@ public class FunctionEntity extends Entity {
 
         color = Color.GREEN;
 
-        mf = new Mathfunction() {
+        mf = new Mathfunction(Mathfunction.Axis.notDefined) {
             @Override
             public float exec3DFunction(float x, float y, float z) {
                 String[] strTmp = new String[function.length - 1];

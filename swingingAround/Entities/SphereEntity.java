@@ -1,6 +1,7 @@
 package swingingAround.Entities;
 
 import swingingAround.ThreeD.Vec3;
+import swingingAround.ThreeD.dMatrix;
 
 import java.awt.*;
 
@@ -62,7 +63,7 @@ public class SphereEntity extends Entity {
         setId("sphere" + number);
         setName("sphere" + number);
 
-        mf1 = new Mathfunction() {
+        mf1 = new Mathfunction(Mathfunction.Axis.y) {
             @Override
             public float exec3DFunction(float x, float y, float z) {
                 float Xsquared = (float) Math.pow(x - center.x,2);
@@ -71,9 +72,8 @@ public class SphereEntity extends Entity {
                 return (float) (Math.sqrt(Math.pow(radius,2) - Xsquared - Zsquared) + center.y);
             }
         };
-        mf1.setCurrentAxis(Mathfunction.Axis.y);
 
-        mf2 = new Mathfunction() {
+        mf2 = new Mathfunction(Mathfunction.Axis.y) {
             @Override
             public float exec3DFunction(float x, float y, float z) {
                 float Xsquared = (float) Math.pow(x - center.x,2);
@@ -82,9 +82,8 @@ public class SphereEntity extends Entity {
                 return (float) (-Math.sqrt(Math.pow(radius,2) - Xsquared - Zsquared) + center.y);
             }
         };
-        mf2.setCurrentAxis(Mathfunction.Axis.y);
 
-        mf3 = new Mathfunction() {
+        mf3 = new Mathfunction(Mathfunction.Axis.z) {
             @Override
             public float exec3DFunction(float x, float y, float z) {
                 float Xsquared = (float) Math.pow(x - center.x,2);
@@ -93,9 +92,8 @@ public class SphereEntity extends Entity {
                 return (float) (Math.sqrt(Math.pow(radius,2) - Xsquared - Ysquared) + center.z);
             }
         };
-        mf3.setCurrentAxis(Mathfunction.Axis.z);
 
-        mf4 = new Mathfunction() {
+        mf4 = new Mathfunction(Mathfunction.Axis.z) {
             @Override
             public float exec3DFunction(float x, float y, float z) {
                 float Xsquared = (float) Math.pow(x - center.x,2);
@@ -104,7 +102,6 @@ public class SphereEntity extends Entity {
                 return (float) (-Math.sqrt(Math.pow(radius,2) - Xsquared - Ysquared) + center.z);
             }
         };
-        mf4.setCurrentAxis(Mathfunction.Axis.z);
 
         mf1.setColor(color);
         mf2.setColor(color);

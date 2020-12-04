@@ -90,6 +90,8 @@ public class Config {
      */
     private ArrayList<PointEntity> points;
 
+    private boolean hasConfigChanged = true;
+
     public Config() {
         entities = new ArrayList<Entity>();
         lines = new ArrayList<LineEntity>();
@@ -145,31 +147,58 @@ public class Config {
 
     public boolean isConfigFreshlyLoaded() { return freshlyLoadedFromFile; }
 
+    public boolean hasConfigChanged() { return hasConfigChanged; }
+
     //Setters
     //------------------------------------------------------------------------------------------------------------------
     public void setGraphingEnabled(boolean graphingEnabled) {
         isGraphingEnabled = graphingEnabled;
+        hasConfigChanged = true;
     }
 
     public void setGraphingTrianglesFilled(boolean graphingTrianglesFilled) {
         this.graphingTrianglesFilled = graphingTrianglesFilled;
+        hasConfigChanged = true;
     }
 
     public void setNumberOfTrianglesX(int numberOfTrianglesX) {
         this.numberOfTrianglesX = numberOfTrianglesX;
+        hasConfigChanged = true;
     }
 
     public void setNumberOfTrianglesZ(int numberOfTrianglesZ) {
         this.numberOfTrianglesZ = numberOfTrianglesZ;
+        hasConfigChanged = true;
     }
 
-    public void setNumberOfTrianglesY(int numberOfTrianglesY) {this.numberOfTrianglesY = numberOfTrianglesY;}
+    public void setNumberOfTrianglesY(int numberOfTrianglesY) {
+        this.numberOfTrianglesY = numberOfTrianglesY;
+        hasConfigChanged = true;
+    }
 
-    public void setCamPos(Vec3 pos) {camPos = pos;}
+    public void setCamPos(Vec3 pos) {
+        //System.out.println(pos + " " + camPos);
+        //Vec3 c = pos;
+        //if (!camPos.equals(pos)) {
+            //System.out.println("EEEEE");
+            camPos = pos;
+            //hasConfigChanged = true;
+        //}
+    }
 
-    public void setStepSize(double newStepSize) { stepSize = newStepSize; }
+    public void setStepSize(double newStepSize) {
+        stepSize = newStepSize;
+        hasConfigChanged = true;
+    }
 
-    public void setFreshlyLoadedFromFile(boolean freshlyLoaded) { freshlyLoadedFromFile = freshlyLoaded; }
+    public void setFreshlyLoadedFromFile(boolean freshlyLoaded) {
+        freshlyLoadedFromFile = freshlyLoaded;
+        hasConfigChanged = true;
+    }
+
+    public void setConfigChangedToTrue() {
+        hasConfigChanged = true;
+    }
 
     //Others
     //------------------------------------------------------------------------------------------------------------------
@@ -181,6 +210,8 @@ public class Config {
     public void addEntity(Entity entity) {
         if (entities.size() < maxNumberOfEntities)
             entities.add(entity);
+
+        hasConfigChanged = true;
     }
 
     /**
@@ -197,6 +228,8 @@ public class Config {
         lines.removeIf(line -> (line.getId().equals(entityId)));
         points.removeIf(point -> (point.getId().equals(entityId)));
         entities.removeIf(n -> (n.getId().equals(entityId)));
+
+        hasConfigChanged = true;
     }
 
     /**
@@ -210,6 +243,7 @@ public class Config {
             Collections.addAll(mfs, entity.getMathfunctions());
         }
 
+        hasConfigChanged = false;
         return mfs;
     }
 
@@ -222,9 +256,10 @@ public class Config {
      * </p>
      */
     public void updateEntity() {
-        lines.removeIf(line -> !line.stillExists());
-        points.removeIf(point -> !point.stillExists());
-        entities.removeIf(entity -> !entity.stillExists());
+        for (int i = 0; i < entities.size(); i++) {
+            if (!entities.get(i).stillExists())
+                removeEntity(entities.get(i).getId());
+        }
     }
 
     /**
@@ -235,6 +270,8 @@ public class Config {
         if (entities.size() < maxNumberOfEntities) {
             lines.add(line);
             entities.add(line);
+
+            hasConfigChanged = true;
         }
     }
 
@@ -246,6 +283,8 @@ public class Config {
         if (entities.size() < maxNumberOfEntities) {
             points.add(point);
             entities.add(point);
+
+            hasConfigChanged = true;
         }
     }
 

@@ -56,7 +56,14 @@ public class dMatrix {
      * @param newValue az új érték
      */
     public void setValueAt(int x, int y, double newValue) {
-        matrix[x * nrOfRows + y] = newValue;
+        try {
+            matrix[x * nrOfRows + y] = newValue;
+        } catch (Exception ex) {
+            System.err.println(x + " " + y);
+            System.err.println(getWidth() + " " + getHeight());
+            ex.printStackTrace();
+            System.exit(0);
+        }
     }
 
     /**
@@ -195,7 +202,7 @@ public class dMatrix {
             for (int j = 0; j < getHeight(); j++) {
                 System.out.print(getValueAt(i,j) + " ");
             }
-            System.out.println();
+            //System.out.println(i + "-dik sor volt ez.");
         }
     }
 }

@@ -60,6 +60,9 @@ public class GeoFrame extends JFrame {
      * Entitás panelekből álló lista.
      */
     private ArrayList<EntityPanel> entityPanels;
+
+    private ArrayList<Mathfunction> mfsInMemory = null;
+
     /**
      * A program menüje.
      */
@@ -288,12 +291,29 @@ public class GeoFrame extends JFrame {
      * </p>
      */
     private void draw() {
-        ArrayList<Mathfunction> mfs = conf.getMathfunctions();
         renderPanel.setScreen(cam.getScreen());
         cam.screen.fillRectangle(0,0,cam.screen.getWidth(), cam.screen.getHeight(), new Color(30,30,30));
         ArrayList<LineEntity> lines = conf.getLines();
 
         float stepSize = (float) conf.getStepSize();
+
+        if ((mfsInMemory == null) || conf.hasConfigChanged()) {
+            mfsInMemory = conf.getMathfunctions();
+            //System.out.println("here");
+            for (Mathfunction mf: mfsInMemory) {
+                switch (mf.getCurrentAxis()) {
+                    case x:
+                        mf.calcMat(cam.getPos(),conf.getNumberOfTrianglesY(),conf.getNumberOfTrianglesZ(),conf.getStepSize());
+                        break;
+                    case y:
+                        mf.calcMat(cam.getPos(),conf.getNumberOfTrianglesX(),conf.getNumberOfTrianglesZ(),conf.getStepSize());
+                        break;
+                    case z:
+                        mf.calcMat(cam.getPos(),conf.getNumberOfTrianglesX(),conf.getNumberOfTrianglesY(),conf.getStepSize());
+                        break;
+                }
+            }
+        }
 
         double xInLoop = conf.getNumberOfTrianglesX()/2.0 * stepSize;
         double yInLoop = conf.getNumberOfTrianglesY()/2.0 * stepSize;
@@ -327,18 +347,21 @@ public class GeoFrame extends JFrame {
             float currentY = (float) (cam.getPos().y - yInLoop);
             float currentZ = (float) (cam.getPos().z - zInLoop);
 
-            for (int j = 0; j < conf.getNumberOfTrianglesY(); j++) {
-                currentY += stepSize;
-                for (int k = 0; k < conf.getNumberOfTrianglesZ(); k++) {
-                    currentZ += stepSize;
-
-                    for (Mathfunction mf: mfs) {
+            //for (int j = 0; j < conf.getNumberOfTrianglesY(); j++) {
+            for (int j = 0; j < 50; j++) {
+                //for (int k = 0; k < conf.getNumberOfTrianglesZ(); k++) {
+                currentY+=stepSize;
+                for (int k = 0; k < 50; k++) {
+                    currentZ+=stepSize;
+                    for (Mathfunction mf: mfsInMemory) {
 
                         if (mf.getCurrentAxis() == Mathfunction.Axis.x) {
-                            double x1 = mf.exec3DFunction(0, currentY, currentZ);
-                            double x2 = mf.exec3DFunction(0, currentY + stepSize, currentZ);
-                            double x3 = mf.exec3DFunction(0, currentY + stepSize, currentZ + stepSize);
-                            double x4 = mf.exec3DFunction(0, currentY, currentZ + stepSize);
+                            double x1 = mf.getMatValueAt(j,k);
+                            double x2 = mf.getMatValueAt(j+1,k);
+                            double x3 = mf.getMatValueAt(j+1,k+1);
+                            double x4 = mf.getMatValueAt(j,k+1);
+                            //System.out.println(currentY + " " + currentZ);
+                            //System.out.println(x1 + " " + x2 + " " + x3 + " " + x4);
 
                             Vec3 v1 = new Vec3(x1,currentY,currentZ);
                             Vec3 v2 = new Vec3(x2,currentY+stepSize,currentZ);
@@ -358,6 +381,10 @@ public class GeoFrame extends JFrame {
                 }
                 currentZ = (float) (cam.getPos().z - zInLoop);
             }
+            /*for (Mathfunction mf: mfs) {
+                if (mf.getCurrentAxis() == Mathfunction.Axis.x)
+                    System.exit(0);
+            }*/
 
             //Y
             //----------------------------------------------------------------------------------------------------------
@@ -366,22 +393,25 @@ public class GeoFrame extends JFrame {
             currentZ = (float) (cam.getPos().z - zInLoop);
 
             for (int i = 0; i < conf.getNumberOfTrianglesX(); i++) {
-                currentX += stepSize;
+                currentX+=stepSize;
                 for (int k = 0; k < conf.getNumberOfTrianglesZ(); k++) {
-                    currentZ += stepSize;
-
-                    for (Mathfunction mf: mfs) {
+                    currentZ+=stepSize;
+                    for (Mathfunction mf: mfsInMemory) {
 
                         if (mf.getCurrentAxis() == Mathfunction.Axis.y) {
-                            double y1 = mf.exec3DFunction(currentX,0,currentZ);
-                            double y2 = mf.exec3DFunction(currentX + stepSize,0,currentZ);
-                            double y3 = mf.exec3DFunction(currentX + stepSize,0,currentZ + stepSize);
-                            double y4 = mf.exec3DFunction(currentX,0,currentZ + stepSize);
+                            double y1 = mf.getMatValueAt(i,k);
+                            double y2 = mf.getMatValueAt(i+1,k);
+                            double y3 = mf.getMatValueAt(i+1,k+1);
+                            double y4 = mf.getMatValueAt(i,k+1);
 
                             Vec3 v1 = new Vec3(currentX,y1,currentZ);
                             Vec3 v2 = new Vec3(currentX+stepSize,y2,currentZ);
                             Vec3 v3 = new Vec3(currentX+stepSize,y3,currentZ+stepSize);
                             Vec3 v4 = new Vec3(currentX,y4,currentZ+stepSize);
+
+                            /*System.out.println(y1 + " " + y2 + " " + y3 + " " + y4);
+                            System.out.println(i + " " + k);
+                            System.out.println("----------------------------------");*/
 
                             if (conf.getGraphingTrianglesFilled()) {
                                 cam.render3DFilledTriangle(new Triangle(v1,v2,v3,mf.getColor()));
@@ -404,17 +434,16 @@ public class GeoFrame extends JFrame {
             currentZ = (float) (cam.getPos().z - zInLoop);
 
             for (int i = 0; i < conf.getNumberOfTrianglesX(); i++) {
-                currentX += stepSize;
+                currentX+=stepSize;
                 for (int j = 0; j < conf.getNumberOfTrianglesY(); j++) {
-                    currentY += stepSize;
-
-                    for (Mathfunction mf: mfs) {
+                    currentY+=stepSize;
+                    for (Mathfunction mf: mfsInMemory) {
 
                         if (mf.getCurrentAxis() == Mathfunction.Axis.z) {
-                            double z1 = mf.exec3DFunction(currentX,currentY,0);
-                            double z2 = mf.exec3DFunction(currentX + stepSize,currentY,0);
-                            double z3 = mf.exec3DFunction(currentX + stepSize,currentY + stepSize,0);
-                            double z4 = mf.exec3DFunction(currentX,currentY + stepSize,0);
+                            double z1 = mf.getMatValueAt(i,j);
+                            double z2 = mf.getMatValueAt(i+1,j);
+                            double z3 = mf.getMatValueAt(i+1,j+1);
+                            double z4 = mf.getMatValueAt(i,j+1);
 
                             Vec3 v1 = new Vec3(currentX,currentY,z1);
                             Vec3 v2 = new Vec3(currentX+stepSize,currentY,z2);
@@ -518,21 +547,27 @@ public class GeoFrame extends JFrame {
 
                 case KeyEvent.VK_W:
                     cam.getPos().moveZByDelta(1);
+                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_S:
                     cam.getPos().moveZByDelta(-1);
+                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_A:
                     cam.getPos().moveXbyDelta(-1);
+                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_D:
                     cam.getPos().moveXbyDelta(1);
+                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_U:
                     cam.getPos().moveYByDelta(1);
+                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_J:
                     cam.getPos().moveYByDelta(-1);
+                    conf.setConfigChangedToTrue();
                     break;
 
                 //Camera rotations
