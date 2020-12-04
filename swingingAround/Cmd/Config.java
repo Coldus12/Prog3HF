@@ -90,6 +90,9 @@ public class Config {
      */
     private ArrayList<PointEntity> points;
 
+    /**
+     * Azt mutatja meg, hogy változott-e a konfigurációban bárminek az értéke.
+     */
     private boolean hasConfigChanged = true;
 
     public Config() {
@@ -177,13 +180,7 @@ public class Config {
     }
 
     public void setCamPos(Vec3 pos) {
-        //System.out.println(pos + " " + camPos);
-        //Vec3 c = pos;
-        //if (!camPos.equals(pos)) {
-            //System.out.println("EEEEE");
-            camPos = pos;
-            //hasConfigChanged = true;
-        //}
+        camPos = pos;
     }
 
     public void setStepSize(double newStepSize) {

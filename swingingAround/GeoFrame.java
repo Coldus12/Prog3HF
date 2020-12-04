@@ -61,6 +61,14 @@ public class GeoFrame extends JFrame {
      */
     private ArrayList<EntityPanel> entityPanels;
 
+    /**
+     * A memóriában tárolt, megjelenítendő entitások Mathfunction-jei
+     * <p>
+     *     Egy függvény adott pontjait elég egyszer kiszámolni addig, amíg
+     *     Minden Mathfunction-höz tartozik egy mátrix, a calcMat()
+     *     függvény ezt a mátrixot feltölti a függvény
+     * </p>
+     */
     private ArrayList<Mathfunction> mfsInMemory = null;
 
     /**
@@ -279,9 +287,13 @@ public class GeoFrame extends JFrame {
     /**
      * Kirajzolja az entitásokat.
      * <p>
-     *     A függvényekhez minden tengelyhez tartozik egy for ciklus, ami meglehetősen
-     *     lassú, ezért van megszabva az, hogy egyszerre maximum csak 10 entitás jeleíthető
-     *     meg (ami így is túl sok). Ez sajnos nem egy szép megoldás, ez csak Brute Force.
+     *     A függvényeket a(z) mfsInMemory listában tárolja a program. Mindegyik függvényhez
+     *     tartozik egy a konfigurációnak (numberOfTriangleX, numberOfTrianglesY, numberOfTrianglesZ)
+     *     megfelelő magas, és széles mátrix, melyben az origo-t véve középpontul "stepsize"
+     *     lépésmérettel már ki vannak számítva előre a függvény értékei. Így azokat csak el
+     *     kell kérni a megfelelő pont(ok)ban a mátrixtól és meg kell őket jeleníteni. Ha a
+     *     konfiguráióban valami változás történik, akkor ezeket a mátrixokat újra számolja
+     *     a program.
      *
      *     A pontokat simán csak kirajzolja a program ha kitudja.
      *
@@ -299,17 +311,17 @@ public class GeoFrame extends JFrame {
 
         if ((mfsInMemory == null) || conf.hasConfigChanged()) {
             mfsInMemory = conf.getMathfunctions();
-            //System.out.println("here");
+            Vec3 origo = new Vec3(0,0,0);
             for (Mathfunction mf: mfsInMemory) {
                 switch (mf.getCurrentAxis()) {
                     case x:
-                        mf.calcMat(cam.getPos(),conf.getNumberOfTrianglesY(),conf.getNumberOfTrianglesZ(),conf.getStepSize());
+                        mf.calcMat(origo,conf.getNumberOfTrianglesY(),conf.getNumberOfTrianglesZ(),conf.getStepSize());
                         break;
                     case y:
-                        mf.calcMat(cam.getPos(),conf.getNumberOfTrianglesX(),conf.getNumberOfTrianglesZ(),conf.getStepSize());
+                        mf.calcMat(origo,conf.getNumberOfTrianglesX(),conf.getNumberOfTrianglesZ(),conf.getStepSize());
                         break;
                     case z:
-                        mf.calcMat(cam.getPos(),conf.getNumberOfTrianglesX(),conf.getNumberOfTrianglesY(),conf.getStepSize());
+                        mf.calcMat(origo,conf.getNumberOfTrianglesX(),conf.getNumberOfTrianglesY(),conf.getStepSize());
                         break;
                 }
             }
@@ -343,13 +355,11 @@ public class GeoFrame extends JFrame {
 
             //X
             //----------------------------------------------------------------------------------------------------------
-            float currentX = (float) (cam.getPos().x - xInLoop);
-            float currentY = (float) (cam.getPos().y - yInLoop);
-            float currentZ = (float) (cam.getPos().z - zInLoop);
+            float currentX = (float) (0 - xInLoop);
+            float currentY = (float) (0 - yInLoop);
+            float currentZ = (float) (0 - zInLoop);
 
-            //for (int j = 0; j < conf.getNumberOfTrianglesY(); j++) {
             for (int j = 0; j < 50; j++) {
-                //for (int k = 0; k < conf.getNumberOfTrianglesZ(); k++) {
                 currentY+=stepSize;
                 for (int k = 0; k < 50; k++) {
                     currentZ+=stepSize;
@@ -360,8 +370,6 @@ public class GeoFrame extends JFrame {
                             double x2 = mf.getMatValueAt(j+1,k);
                             double x3 = mf.getMatValueAt(j+1,k+1);
                             double x4 = mf.getMatValueAt(j,k+1);
-                            //System.out.println(currentY + " " + currentZ);
-                            //System.out.println(x1 + " " + x2 + " " + x3 + " " + x4);
 
                             Vec3 v1 = new Vec3(x1,currentY,currentZ);
                             Vec3 v2 = new Vec3(x2,currentY+stepSize,currentZ);
@@ -379,18 +387,15 @@ public class GeoFrame extends JFrame {
 
                     }
                 }
-                currentZ = (float) (cam.getPos().z - zInLoop);
+                currentZ = (float) (0 - zInLoop);
             }
-            /*for (Mathfunction mf: mfs) {
-                if (mf.getCurrentAxis() == Mathfunction.Axis.x)
-                    System.exit(0);
-            }*/
 
             //Y
             //----------------------------------------------------------------------------------------------------------
-            currentX = (float) (cam.getPos().x - xInLoop);
-            currentY = (float) (cam.getPos().y - yInLoop);
-            currentZ = (float) (cam.getPos().z - zInLoop);
+            currentX = (float) (0 - xInLoop);
+            currentY = (float) (0 - yInLoop);
+            currentZ = (float) (0 - zInLoop);
+
 
             for (int i = 0; i < conf.getNumberOfTrianglesX(); i++) {
                 currentX+=stepSize;
@@ -409,10 +414,6 @@ public class GeoFrame extends JFrame {
                             Vec3 v3 = new Vec3(currentX+stepSize,y3,currentZ+stepSize);
                             Vec3 v4 = new Vec3(currentX,y4,currentZ+stepSize);
 
-                            /*System.out.println(y1 + " " + y2 + " " + y3 + " " + y4);
-                            System.out.println(i + " " + k);
-                            System.out.println("----------------------------------");*/
-
                             if (conf.getGraphingTrianglesFilled()) {
                                 cam.render3DFilledTriangle(new Triangle(v1,v2,v3,mf.getColor()));
                                 cam.render3DFilledTriangle(new Triangle(v1,v4,v3,mf.getColor()));
@@ -424,14 +425,15 @@ public class GeoFrame extends JFrame {
 
                     }
                 }
-                currentZ = (float) (cam.getPos().z - zInLoop);
+                currentZ = (float) (0 - zInLoop);
             }
 
             //Z
             //----------------------------------------------------------------------------------------------------------
-            currentX = (float) (cam.getPos().x - xInLoop);
-            currentY = (float) (cam.getPos().y - yInLoop);
-            currentZ = (float) (cam.getPos().z - zInLoop);
+            currentX = (float) (0 - xInLoop);
+            currentY = (float) (0 - yInLoop);
+            currentZ = (float) (0 - zInLoop);
+
 
             for (int i = 0; i < conf.getNumberOfTrianglesX(); i++) {
                 currentX+=stepSize;
@@ -461,7 +463,7 @@ public class GeoFrame extends JFrame {
 
                     }
                 }
-                currentY = (float) (cam.getPos().y - yInLoop);
+                currentY = (float) (0 - yInLoop);
             }
         }
 
@@ -547,27 +549,21 @@ public class GeoFrame extends JFrame {
 
                 case KeyEvent.VK_W:
                     cam.getPos().moveZByDelta(1);
-                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_S:
                     cam.getPos().moveZByDelta(-1);
-                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_A:
                     cam.getPos().moveXbyDelta(-1);
-                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_D:
                     cam.getPos().moveXbyDelta(1);
-                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_U:
                     cam.getPos().moveYByDelta(1);
-                    conf.setConfigChangedToTrue();
                     break;
                 case KeyEvent.VK_J:
                     cam.getPos().moveYByDelta(-1);
-                    conf.setConfigChangedToTrue();
                     break;
 
                 //Camera rotations

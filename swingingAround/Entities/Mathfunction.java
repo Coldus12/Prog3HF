@@ -1,6 +1,5 @@
 package swingingAround.Entities;
 
-import swingingAround.ThreeD.Triangle;
 import swingingAround.ThreeD.Vec3;
 import swingingAround.ThreeD.dMatrix;
 
@@ -10,6 +9,12 @@ import java.awt.*;
  * A térbeli függvény reprezentációja.
  */
 public abstract class Mathfunction {
+    /**
+     * Egy adott méretű mátrix, melyben a függvény egy
+     * egy adott mennyiségű a függvénnyel előre kiszámított
+     * értéket tárol, így azokat elegendő csak a megfelelő helyen
+     * megjeleníteni.
+     */
     private dMatrix mat;
 
     public Mathfunction(Axis axis) {
@@ -55,6 +60,15 @@ public abstract class Mathfunction {
      */
     public abstract float exec3DFunction(float x, float y, float z);
 
+    /**
+     * Kiszámolja egy adott középponthoz tartozó "width" széles, "height" magas
+     * mátrixba a függvény értékeit, így azokat később nem feltétlenül kell
+     * újraszámolni.
+     * @param middle a pont amit úgy vesz, mintha a mátrix közepe lenne
+     * @param width a mátrix szélessége
+     * @param height a mátrix magassága
+     * @param stepSize a lépésméret a számításhoz
+     */
     public void calcMat(Vec3 middle, int width, int height, double stepSize) {
         width += 1;
         height += 1;
