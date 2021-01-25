@@ -7,7 +7,7 @@
 A GeoCopy a GeoGebra nevezetű szoftver térbeli változatának a másolata. Ez a másolat többek között képes egy beírt függvényt ábrázolni. Emellett képes tetszőleges egyenesek, pontok, gömbök ábrázolására is. Ez segíthet vizualizálni a függvényeket, esetleg megérteni az egymáshoz való viszonyukat.
 
 Például itt ez az  `y=10*sin((x^2+z^2)^(1/2))/((x^2+z^2)^(1/2))` függvény ábrázolva:
-![Egy kép a függvényről](geoCopy1.png)
+![Egy kép a függvényről](geoCopy1.PNG)
 
 ### Használati útmutató:
 
