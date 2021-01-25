@@ -75,3 +75,7 @@ A `Load` opció a `Save as`-hez hasonlóan egy új ablakot nyit meg, melyben ki 
 ### Dokumentáció
 
 A program dokumentációja megtalálható a forráskódban JavaDoc kommentekként.
+
+### Letöltés
+
+<a href="https://github.com/Coldus12/Prog3HF/releases/download/v1.1/GeoCopy.jar" download>Letöltéshez kattins ide!</a>
