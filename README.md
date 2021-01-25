@@ -49,10 +49,7 @@ A kamera forgatásának billentyűi:
 - Y – z tengely körül 1 fokkal fordul el a kamera
 - X – z tengely körül -1 fokkal fordul el a kamera
 
-Az ablak bal oldalán található egy panel, melyben fel van sorolva az összes entitás melyet megjelenítünk. Mindegyik felsorolt elemhez tartozik egy szöveges rész, melyben szerepel az entitás parancsa/függvénye, amit átírhatunk, ezzel megváltoztatva azt. Emellett mindegyik
-
-
-elemhez tartozik egy szín (alapértelmezésben a zöld), amit egy felsorolásból kiválasztva lehet megváltoztatni. Az elemekhez tartozik egy „Delete” gomb is, mely a megnyomása után kitörli a megfelelő entitást. Egyszerre a program maximum 10 entitást képes megjeleníteni.
+Az ablak bal oldalán található egy panel, melyben fel van sorolva az összes entitás melyet megjelenítünk. Mindegyik felsorolt elemhez tartozik egy szöveges rész, melyben szerepel az entitás parancsa/függvénye, amit átírhatunk, ezzel megváltoztatva azt. Emellett mindegyik elemhez tartozik egy szín (alapértelmezésben a zöld), amit egy felsorolásból kiválasztva lehet megváltoztatni. Az elemekhez tartozik egy `Delete` gomb is, mely a megnyomása után kitörli a megfelelő entitást. Egyszerre a program maximum 10 entitást képes megjeleníteni.
 
 A program rendelkezik egy menüvel is, melyben 3 menüpont van. Sorban: `Save`, `Save as`, `Load`. A `Save` menüpont kiválasztása után a program kiírja egy szöveges fájlba (ami .gkk-ra végződik) a kamera pozícióját, majd az összes megjelenített entitás parancsát, oly módon, hogy minden parancs egy új sorba kerüljön. Ezt követően parancs formájában külön sorokba kiírja azt, hogy az x, y, és a z tengely mentén hány háromszöget rajzol ki a program, majd azt hogy teli háromszögeket rajzol-e ki a program, és végül azt, hogy mekkora a lépésméret. Erre példa:
 
@@ -78,4 +75,5 @@ A program dokumentációja megtalálható a forráskódban JavaDoc kommentekkén
 
 ### Letöltés
 
-<a href="https://github.com/Coldus12/Prog3HF/releases/download/v1.1/GeoCopy.jar" download>Letöltéshez kattins ide!</a>
+A programot .jar fájl-ként lehet letölteni.
+<a href="https://github.com/Coldus12/Prog3HF/releases/download/v1.1/GeoCopy.jar" download>Letöltéshez kattints ide!</a>
